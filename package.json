@@ -1,0 +1,27 @@
+{
+  "name": "Progetto-Programmazione-Avanzata-Gestione-Vaccinazioni",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.18.1",
+    "nodemon": "^2.0.18"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SuperCappa98/Progetto-Programmazione-Avanzata-Gestione-Vaccinazioni.git"
+  },
+  "keywords": [],
+  "author": "Burini Lisa, Cappanera Simone",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SuperCappa98/Progetto-Programmazione-Avanzata-Gestione-Vaccinazioni/issues"
+  },
+  "homepage": "https://github.com/SuperCappa98/Progetto-Programmazione-Avanzata-Gestione-Vaccinazioni#readme"
+}
