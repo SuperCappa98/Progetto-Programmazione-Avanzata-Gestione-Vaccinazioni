@@ -27,8 +27,7 @@ app.use(CoR.JWT);
 
 
 // Route to add vaccine
-app.get('/addVax', checkUserRole, Middleware.functions, controller
-});
+//app.get('/addVax', checkUserRole, Middleware.functions, controller);
 
 
 /*

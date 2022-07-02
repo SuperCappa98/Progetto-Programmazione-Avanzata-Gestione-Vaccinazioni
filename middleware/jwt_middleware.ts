@@ -1,6 +1,6 @@
 require('dotenv').config();
 import * as jwt from 'jsonwebtoken';
-import { STATUS_CODES } from "http";
+const { StatusCode } = require('status-code-enum')
 
 
 /**
@@ -59,7 +59,7 @@ export const checkToken = (req: any, res: any, next: any) => {
 };
 
 export const errorHandler =  (err: Error, req: any, res: any, next: any) => {
-    res.status(STATUS_CODES.UNAUTHORIZED).send({"error": err.message});
+    res.status(StatusCode.ClientErrorUnauthorized).send({"error": err.message});
 };
 
 
