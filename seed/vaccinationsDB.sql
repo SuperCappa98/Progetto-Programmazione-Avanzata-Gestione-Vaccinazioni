@@ -80,7 +80,7 @@ CREATE TABLE vaccination (
 --
 
 ALTER TABLE vaccination
-  ADD PRIMARY KEY (batch, delivery_date, vaccine, codice_fiscale),
+  ADD PRIMARY KEY (batch, delivery_date, vaccine, user_key),
   ADD CONSTRAINT vaccination_FK_batch FOREIGN KEY(batch, delivery_date, vaccine) REFERENCES batch(batch, delivery_date, vaccine) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 --
