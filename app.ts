@@ -1,20 +1,14 @@
-
-// Requiring module
-const express = require('express');
+// Import libraries
+'use strict';
+import express from "express";
  
-// Creating express object
+// Creating express object (in this case, the app)
 const app = express();
- 
-// Handling GET request
-app.get('/', (req, res) => {
-    res.send('A simple Node App is '
-        + 'running on this server')
-    res.end()
-})
- 
-// Port Number
-const PORT = process.env.PORT ||3000;
+
+//Network constants
+const PORT = 8080;
+const HOST = '0.0.0.0';
  
 // Server Setup
-app.listen(PORT,console.log(
-  `Server started on port ${PORT}`));
+app.listen(PORT, HOST);
+console.log(`Server started on port ${PORT}`);
