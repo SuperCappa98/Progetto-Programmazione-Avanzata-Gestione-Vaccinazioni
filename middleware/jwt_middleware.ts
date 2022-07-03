@@ -1,6 +1,5 @@
 require('dotenv').config();
 import * as jwt from 'jsonwebtoken';
-const { StatusCode } = require('status-code-enum')
 
 
 /**
@@ -50,7 +49,7 @@ export const checkToken = (req: any, res: any, next: any) => {
             req.user = decoded;
             next();
         }else{
-            let error = new Error("Authentication Error") 
+            let error = new Error("Authentication Error");
             next(error);
         }
     }catch(error){
@@ -58,16 +57,32 @@ export const checkToken = (req: any, res: any, next: any) => {
     }
 };
 
-export const errorHandler =  (err: Error, req: any, res: any, next: any) => {
-    res.status(StatusCode.ClientErrorUnauthorized).send({"error": err.message});
+
+// check sintax of token fields and user role (admin/user)
+export const checkJwtPayload = (req: any, res: any, next: any) => {
+    try{
+        console.log(req.user);
+        if((req.user.role === "Admin" || req.user.role === "User") && (typeof req.user.name === "string") && (typeof req.user.surname === "string") && (req.user.userKey.length === 16) ){
+            next();
+        }else{
+            let error = new Error("User data are bad formatted!");
+            next(error);
+        }
+    }catch(error){
+        next(error);
+    }
 };
 
 
-export const checkUserRole = (req: any, res: any, next: any) => {
+
+export const checkAdmin = (req: any, res: any, next: any) => {
     try{
-        
-        next();
-        
+        if(req.user.role === "Admin"){
+            next();
+        }else{
+            let error = new Error("You are not an Admin!");
+            next(error);
+        }
     }catch(error){
         next(error);
     }
