@@ -15,7 +15,6 @@ CREATE TABLE vaccine (
   coverage INT NOT NULL
 );
 
-
 --
 -- Data dump for "vaccine" table 
 --
@@ -64,6 +63,26 @@ INSERT INTO batch (batch, delivery_date, vaccine, doses, expiration_date)
 -- --------------------------------------------------------
 
 --
+-- Structure of "users" table
+--
+
+CREATE TABLE users (
+  user_key varchar(16) PRIMARY KEY
+);
+
+--
+-- Data dump for "users" table 
+--
+
+INSERT INTO users (user_key)
+	VALUES
+    ('GTTNDR80A03A271U'),
+    ('RMGLRA71R68H501V'),
+    ('RGNGNN86E53F839L');
+
+-- --------------------------------------------------------
+
+--
 -- Structure of "vaccination" table
 --
 
@@ -81,7 +100,8 @@ CREATE TABLE vaccination (
 
 ALTER TABLE vaccination
   ADD PRIMARY KEY (batch, delivery_date, vaccine, user_key),
-  ADD CONSTRAINT vaccination_FK_batch FOREIGN KEY(batch, delivery_date, vaccine) REFERENCES batch(batch, delivery_date, vaccine) ON DELETE RESTRICT ON UPDATE CASCADE;
+  ADD CONSTRAINT vaccination_FK_batch FOREIGN KEY(batch, delivery_date, vaccine) REFERENCES batch(batch, delivery_date, vaccine) ON DELETE RESTRICT ON UPDATE CASCADE,
+  ADD CONSTRAINT vaccination_FK_users FOREIGN KEY(user_key) REFERENCES users(user_key) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 --
 -- Data dump for "vaccination" table 
