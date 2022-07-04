@@ -1,6 +1,7 @@
 // Import libraries
 'use strict';
 import express from "express";
+import * as controller from './controller/controller';
 import { STATUS_CODES } from "http";
 import * as CoR from './middleware/CoR';
 import * as jwtMdlw from './middleware/jwt_middleware';
@@ -33,6 +34,7 @@ app.use(CoR.jwtPayload);
 // Route to add vaccine
 app.post('/addVax', CoR.checkAdmin, CoR.checkVaxData, (req:any,res:any) => {
    res.send('you are an admin && input data are OK: You can add vax!')
+   controller.addVax(req.body.name, req.body.coverage);
 });
 
 
