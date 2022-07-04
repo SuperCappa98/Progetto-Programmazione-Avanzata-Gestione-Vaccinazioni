@@ -9,7 +9,7 @@ services:
         ports:
           - 5432:5432
         volumes:
-          - ./seed/vaccinationsDB.sql:/docker-entrypoint-initdb.d/vaccinationsDB.sql          
+          - ./seed/vaccinationsdb.sql:/docker-entrypoint-initdb.d/vaccinationsdb.sql          
     web-node:
         build: .
         restart: always
