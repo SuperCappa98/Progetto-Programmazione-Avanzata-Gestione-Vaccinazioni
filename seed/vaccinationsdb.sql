@@ -1,9 +1,9 @@
 --
--- Database: `vaccinationsDB`
+-- Database: `vaccinationsdb`
 --
 
-CREATE DATABASE vaccinationsDB;
-\c vaccinationsDB
+CREATE DATABASE vaccinationsdb;
+\c vaccinationsdb
 
 --
 -- Structure of "vaccine" table
