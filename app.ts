@@ -34,7 +34,7 @@ app.use(CoR.jwtPayload);
 // Route to add vaccine
 app.post('/addVax', CoR.checkAdmin, CoR.checkVaxData, (req:any,res:any) => {
    res.send('you are an admin && input data are OK: You can add vax!')
-   controller.addVax(req.body.name, req.body.coverage);
+   // controller.addVax(req.body.name, req.body.coverage);
 });
 
 
