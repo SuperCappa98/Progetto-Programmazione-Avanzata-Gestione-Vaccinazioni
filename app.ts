@@ -30,11 +30,9 @@ app.use(CoR.jwtPayload);
     res.send('app is running & your token is valid & well formatted!');
 });
 
-
 // Route to add vaccine
 app.post('/addVax', CoR.checkAdmin, CoR.checkVaxData, (req:any,res:any) => {
-   res.send('you are an admin && input data are OK: You can add vax!')
-   // controller.addVax(req.body.name, req.body.coverage);
+    controller.addVax(req.body.vaxName, req.body.coverage, res);
 });
 
 
