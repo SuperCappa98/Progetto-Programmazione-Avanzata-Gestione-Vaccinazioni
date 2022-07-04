@@ -21,9 +21,9 @@ CREATE TABLE vaccine (
 
 INSERT INTO vaccine (vaccine_name, coverage)
 	VALUES
-	('Vaxzevria', 270),
-	('Comirnaty', 90),
-	('Spikevax', 180);
+	('vaxzevria', 270),
+	('comirnaty', 90),
+	('spikevax', 180);
 
 -- --------------------------------------------------------
 
