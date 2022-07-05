@@ -1,11 +1,8 @@
-const { StatusCode } = require('status-code-enum')
+import {getErrorMsg} from "../factory/errorMsg";
 
 
-export const errorHandlerUnauth =  (err: Error, req: any, res: any, next: any) => {
-    res.status(StatusCode.ClientErrorUnauthorized).send({"error": err.message});
+export const errorHandler =  (err: any, req: any, res: any, next: any) => {
+    const err_msg = getErrorMsg(err).getMsg();
+    console.log(err_msg);
+    res.status(err_msg.status).json({Error: err_msg.status, Description:err_msg.status});
 };
-
-export const errorHandlerBadRequest =  (err: Error, req: any, res: any, next: any) => {
-    res.status(StatusCode.ClientErrorBadRequest).send({"error": err.message});
-};
-

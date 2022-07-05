@@ -4,8 +4,8 @@ import {SuccessMsgEnum, getSuccessMsg} from "../factory/successMsg";
 
 
 function controllerErrors(err_msg_enum:ErrorMsgEnum, error:Error, res:any){
-    const new_err_msg = getErrorMsg(err_msg_enum).getMsg();
     console.log(error);
+    const new_err_msg = getErrorMsg(err_msg_enum).getMsg();
     res.status(new_err_msg.status).json({Error:new_err_msg.status, Description:new_err_msg.msg});
 }
 
@@ -23,4 +23,4 @@ export async function addVax(name: string, coverage: number, res: any): Promise<
     }catch (error:any) {
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
     }
-} 
+}

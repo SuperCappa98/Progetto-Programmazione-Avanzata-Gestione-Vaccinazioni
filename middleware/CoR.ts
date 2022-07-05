@@ -11,22 +11,20 @@ import * as vaxMiddleware from './vax_middleware';
     JwtMiddleware.checkHeader,
     JwtMiddleware.checkToken,
     JwtMiddleware.verifyAndAuthenticate,
-    errorHandler.errorHandlerUnauth
+    errorHandler.errorHandler
 ]
 
 export const jwtPayload = [
     JwtMiddleware.checkJwtPayload,
-    errorHandler.errorHandlerBadRequest
+    errorHandler.errorHandler
 ]
 
 export const checkAdmin = [
     JwtMiddleware.checkAdmin,
-    errorHandler.errorHandlerUnauth
+    errorHandler.errorHandler
 ]
 
 export const checkVaxData = [
     vaxMiddleware.checkVaxData,
-    errorHandler.errorHandlerBadRequest
+    errorHandler.errorHandler
 ]
-
-

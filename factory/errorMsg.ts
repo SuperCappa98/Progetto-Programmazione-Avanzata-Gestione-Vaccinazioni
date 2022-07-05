@@ -56,6 +56,24 @@ class InternalServerErrorMsg implements Msg{
     }
 }
 
+class VaxNameErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorConflict,
+            msg: "Conflict - Vaccine name already exists"
+        }
+    }
+}
+
+class BadFormattedVaxDataErrorMsg implements Msg{
+    getMsg(): { status: number,  msg: string } {
+        return {
+            status: StatusCode.ClientErrorBadRequest,
+            msg: "Bad Request - Formatting Error: vaccine data are bad formatted"
+        }
+    }
+}
+
 
 export enum ErrorMsgEnum {
     NoHeader,
@@ -63,7 +81,9 @@ export enum ErrorMsgEnum {
     InvalidToken,
     BadFormattedPayload,
     Unauthorized,
-    InternalServer
+    InternalServer,
+    VaxName,
+    BadFormattedVaxData
 }
 
 export function getErrorMsg(type: ErrorMsgEnum): Msg{
@@ -86,7 +106,10 @@ export function getErrorMsg(type: ErrorMsgEnum): Msg{
             break;
         case ErrorMsgEnum.InternalServer:
             msgval = new InternalServerErrorMsg();
+        case ErrorMsgEnum.VaxName:
+            msgval = new VaxNameErrorMsg();
+        case ErrorMsgEnum.BadFormattedVaxData:
+            msgval = new BadFormattedVaxDataErrorMsg();
     }
     return msgval;
 }
-

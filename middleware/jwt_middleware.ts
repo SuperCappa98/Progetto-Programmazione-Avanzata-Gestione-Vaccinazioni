@@ -12,74 +12,62 @@ import {ErrorMsgEnum} from "../factory/errorMsg";
 
 // Check request header 
  export const checkHeader = (req: any, res: any, next: any) => {
-    try{
-        const authHeader = req.headers.authorization;
-        if(authHeader){
-            next();
-        } else {
-            next(ErrorMsgEnum.NoHeader);
-        }
-    }catch(error){
-        next(error);
+    
+    const authHeader = req.headers.authorization;
+    if(authHeader){
+        next();
+    } else {
+        next(ErrorMsgEnum.NoHeader);
     }
+    
 };
 
 // Get token from request header
 export const checkToken = (req: any, res: any, next: any) => {
-    try{
-        const bearerHeader = req.headers.authorization;
-        if(typeof bearerHeader!=='undefined'){
-            const bearerToken = bearerHeader.split(' ')[1];
-            req.token = bearerToken;
-            next();
-        }else{
-            next(ErrorMsgEnum.MissingToken);
-        }
-    }catch(error){
-        next(error);
+    
+    const bearerHeader = req.headers.authorization;
+    if(typeof bearerHeader!=='undefined'){
+        const bearerToken = bearerHeader.split(' ')[1];
+        req.token = bearerToken;
+        next();
+    }else{
+        next(ErrorMsgEnum.MissingToken);
     }
+    
 };
 
 // Check token key and decoded payload
  export const verifyAndAuthenticate = (req: any, res: any, next: any) => {
-    try{
-        let decoded = jwt.verify(req.token, process.env.SECRET_KEY!);
-        if(decoded !== null){
-            req.user = decoded;
-            next();
-        }else{
-            next(ErrorMsgEnum.InvalidToken);
-        }
-    }catch(error){
-        next(error);
+    
+    let decoded = jwt.verify(req.token, process.env.SECRET_KEY!);
+    if(decoded !== null){
+        req.user = decoded;
+        next();
+    }else{
+        next(ErrorMsgEnum.InvalidToken);
     }
+    
 };
-
 
 // Check sintax of token fields and user role (admin/user)
 export const checkJwtPayload = (req: any, res: any, next: any) => {
-    try{
-        console.log(req.user);
-        if((req.user.role === "Admin" || req.user.role === "User") && (typeof req.user.name === "string") && (typeof req.user.surname === "string") && (req.user.userKey.length === 16) ){
-            next();
-        }else{
-            next(ErrorMsgEnum.BadFormattedPayload);
-        }
-    }catch(error){
-        next(error);
+    
+    console.log(req.user);
+    if((req.user.role === "Admin" || req.user.role === "User") && (typeof req.user.name === "string") && (typeof req.user.surname === "string") && (req.user.userKey.length === 16) ){
+        next();
+    }else{
+        next(ErrorMsgEnum.BadFormattedPayload);
     }
+
 };
 
-
-
+// 
 export const checkAdmin = (req: any, res: any, next: any) => {
-    try{
-        if(req.user.role === "Admin"){
-            next();
-        }else{
-            next(ErrorMsgEnum.Unauthorized);
-        }
-    }catch(error){
-        next(error);
+    
+    if(req.user.role === "Admin"){
+        next();
+    }else{
+        next(ErrorMsgEnum.Unauthorized);
     }
+   
 };
