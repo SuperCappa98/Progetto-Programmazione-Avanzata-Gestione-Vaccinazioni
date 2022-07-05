@@ -33,6 +33,11 @@ app.post('/addVax', CoR.checkAdmin, CoR.checkVaxData, (req:any,res:any) => {
     controller.addVax(req.body.vaxName, req.body.coverage, res);
 });
 
+// Route to add N doses of a vaccine
+app.post('/addDoses', CoR.checkAdmin, CoR.checkDosesData, (req:any,res:any) => {
+    res.send('you can add these doses!');
+    // controller.addVax(req.body.vaxName, req.body.coverage, res);
+});
 
 
 

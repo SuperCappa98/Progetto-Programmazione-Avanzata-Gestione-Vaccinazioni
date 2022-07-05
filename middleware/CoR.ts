@@ -28,3 +28,13 @@ export const checkVaxData = [
     vaxMiddleware.checkVaxData,
     errorHandler.errorHandler
 ]
+
+export const checkDosesData = [
+    vaxMiddleware.checkDosesValue,
+    vaxMiddleware.checkBatchValue,
+    vaxMiddleware.checkDeliveryDate,
+    vaxMiddleware.checkExpirationDate,
+    vaxMiddleware.checkVaccineId,
+    vaxMiddleware.checkDelivery,
+    errorHandler.errorHandler
+]
