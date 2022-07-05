@@ -1,7 +1,7 @@
 
 import {Vaccine} from "../models/Vaccine";
 
-// check vax data types and check no other vaccine in db with the same name
+// Check vax data types and check no other vaccine in db with the same name
 export const checkVaxData = async (req: any, res: any, next: any) => {
     try{
         console.log("request body: ", req.body);
@@ -12,6 +12,7 @@ export const checkVaxData = async (req: any, res: any, next: any) => {
             if (nameDuplicated === null) {
                 next();
             }else{
+                //mi manca da scrivere questo errore e quello sotto dopo pranzo
                 let error = new Error("Vax name already exists!");
                 next(error);
             }         

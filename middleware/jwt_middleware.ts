@@ -1,5 +1,6 @@
 require('dotenv').config();
 import * as jwt from 'jsonwebtoken';
+import {ErrorMsgEnum} from "../factory/errorMsg";
 
 
 /**
@@ -16,8 +17,7 @@ import * as jwt from 'jsonwebtoken';
         if(authHeader){
             next();
         } else {
-            let error = new Error("No request header");
-            next(error);
+            next(ErrorMsgEnum.NoHeader);
         }
     }catch(error){
         next(error);
@@ -33,8 +33,7 @@ export const checkToken = (req: any, res: any, next: any) => {
             req.token = bearerToken;
             next();
         }else{
-            let error = new Error("Request header undefined") 
-            next(error)
+            next(ErrorMsgEnum.MissingToken);
         }
     }catch(error){
         next(error);
@@ -49,8 +48,7 @@ export const checkToken = (req: any, res: any, next: any) => {
             req.user = decoded;
             next();
         }else{
-            let error = new Error("Authentication Error");
-            next(error);
+            next(ErrorMsgEnum.InvalidToken);
         }
     }catch(error){
         next(error);
@@ -58,15 +56,14 @@ export const checkToken = (req: any, res: any, next: any) => {
 };
 
 
-// check sintax of token fields and user role (admin/user)
+// Check sintax of token fields and user role (admin/user)
 export const checkJwtPayload = (req: any, res: any, next: any) => {
     try{
         console.log(req.user);
         if((req.user.role === "Admin" || req.user.role === "User") && (typeof req.user.name === "string") && (typeof req.user.surname === "string") && (req.user.userKey.length === 16) ){
             next();
         }else{
-            let error = new Error("User data are bad formatted!");
-            next(error);
+            next(ErrorMsgEnum.BadFormattedPayload);
         }
     }catch(error){
         next(error);
@@ -80,8 +77,7 @@ export const checkAdmin = (req: any, res: any, next: any) => {
         if(req.user.role === "Admin"){
             next();
         }else{
-            let error = new Error("You are not an Admin!");
-            next(error);
+            next(ErrorMsgEnum.Unauthorized);
         }
     }catch(error){
         next(error);
