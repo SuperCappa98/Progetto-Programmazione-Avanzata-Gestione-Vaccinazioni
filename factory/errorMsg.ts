@@ -2,6 +2,15 @@ import {Msg} from "./Msg";
 const { StatusCode } = require('status-code-enum')
 
 
+class BadFormattedPayloadErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorBadRequest,
+            msg: "Bad Request - Formatting Error: payload is bad formatted"
+        }
+    }
+}
+
 class NoHeaderErrorMsg implements Msg{
     getMsg(): { status: number; msg: string; } {
         return {
@@ -29,11 +38,11 @@ class InvalidTokenErrorMsg implements Msg{
     }
 }
 
-class BadFormattedPayloadErrorMsg implements Msg{
+class BadFormattedUserDataErrorMsg implements Msg{
     getMsg(): { status: number,  msg: string } {
         return {
             status: StatusCode.ClientErrorBadRequest,
-            msg: "Bad Request - Formatting Error: user data are bad formatted"
+            msg: "Bad Request - Formatting Error: user data in the JWT payload are bad formatted"
         }
     }
 }
@@ -76,10 +85,11 @@ class BadFormattedVaxDataErrorMsg implements Msg{
 
 
 export enum ErrorMsgEnum {
+    BadFormattedPayload,
     NoHeader,
     MissingToken,
     InvalidToken,
-    BadFormattedPayload,
+    BadFormattedUserData,
     Unauthorized,
     InternalServer,
     VaxName,
@@ -89,6 +99,9 @@ export enum ErrorMsgEnum {
 export function getErrorMsg(type: ErrorMsgEnum): Msg{
     let msgval: Msg;
     switch(type){
+        case ErrorMsgEnum.BadFormattedPayload:
+            msgval = new BadFormattedPayloadErrorMsg();
+            break;
         case ErrorMsgEnum.NoHeader:
             msgval = new NoHeaderErrorMsg();
             break;
@@ -98,18 +111,22 @@ export function getErrorMsg(type: ErrorMsgEnum): Msg{
         case ErrorMsgEnum.InvalidToken:
             msgval = new InvalidTokenErrorMsg();
             break;
-        case ErrorMsgEnum.BadFormattedPayload:
-            msgval = new BadFormattedPayloadErrorMsg();
+        case ErrorMsgEnum.BadFormattedUserData:
+            msgval = new BadFormattedUserDataErrorMsg();
             break;
         case ErrorMsgEnum.Unauthorized:
             msgval = new UnauthorizedErrorMsg();
             break;
         case ErrorMsgEnum.InternalServer:
             msgval = new InternalServerErrorMsg();
+            break;
         case ErrorMsgEnum.VaxName:
             msgval = new VaxNameErrorMsg();
+            break;
         case ErrorMsgEnum.BadFormattedVaxData:
             msgval = new BadFormattedVaxDataErrorMsg();
+            break;
     }
+    console.log(msgval);
     return msgval;
 }

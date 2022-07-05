@@ -2,11 +2,9 @@
 'use strict';
 import express from "express";
 import * as controller from './controller/controller';
-import { STATUS_CODES } from "http";
 import * as CoR from './middleware/CoR';
-import * as jwtMdlw from './middleware/jwt_middleware';
-const { StatusCode } = require('status-code-enum')
-var bodyParser = require('body-parser')
+import {ErrorMsgEnum, getErrorMsg} from "./factory/errorMsg";
+
 
 
 // Creating express object (in this case, the app)
@@ -17,7 +15,7 @@ const PORT = 8080;
 const HOST = '0.0.0.0';
 
 // Parse data into request body
-app.use(bodyParser.json())
+app.use(express.json());
 
 // Token Validation
 app.use(CoR.jwt);

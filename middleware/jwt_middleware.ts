@@ -11,7 +11,7 @@ import {ErrorMsgEnum} from "../factory/errorMsg";
 
 
 // Check request header 
- export const checkHeader = (req: any, res: any, next: any) => {
+export const checkHeader = (req: any, res: any, next: any) => {
     
     const authHeader = req.headers.authorization;
     if(authHeader){
@@ -24,13 +24,14 @@ import {ErrorMsgEnum} from "../factory/errorMsg";
 
 // Get token from request header
 export const checkToken = (req: any, res: any, next: any) => {
-    
+    try{
     const bearerHeader = req.headers.authorization;
-    if(typeof bearerHeader!=='undefined'){
+    if(typeof bearerHeader!== 'undefined'){
         const bearerToken = bearerHeader.split(' ')[1];
         req.token = bearerToken;
         next();
-    }else{
+    }
+    }catch(error){
         next(ErrorMsgEnum.MissingToken);
     }
     
@@ -38,15 +39,17 @@ export const checkToken = (req: any, res: any, next: any) => {
 
 // Check token key and decoded payload
  export const verifyAndAuthenticate = (req: any, res: any, next: any) => {
-    
-    let decoded = jwt.verify(req.token, process.env.SECRET_KEY!);
-    if(decoded !== null){
-        req.user = decoded;
-        next();
-    }else{
+
+    try{
+        let decoded = jwt.verify(req.token, process.env.SECRET_KEY!);
+        if(decoded !== null){
+            req.user = decoded;
+            next();
+        }
+    }catch(error){
         next(ErrorMsgEnum.InvalidToken);
     }
-    
+
 };
 
 // Check sintax of token fields and user role (admin/user)
@@ -56,7 +59,7 @@ export const checkJwtPayload = (req: any, res: any, next: any) => {
     if((req.user.role === "Admin" || req.user.role === "User") && (typeof req.user.name === "string") && (typeof req.user.surname === "string") && (req.user.userKey.length === 16) ){
         next();
     }else{
-        next(ErrorMsgEnum.BadFormattedPayload);
+        next(ErrorMsgEnum.BadFormattedUserData);
     }
 
 };
