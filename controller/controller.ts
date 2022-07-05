@@ -39,14 +39,11 @@ export async function addVaxDoses(doses:number, batch:string, delivery_date:Date
         console.log("expiration DATE", expiration_date);
 
         await Batch.create({ doses: doses, batch: batch, delivery_date: delivery_date, vaccine: vaccine_id, expiration_date: expiration_date})
-        .then(() => {
-            res.send("batch just inserted!");
-
-            /*
-            const new_res_msg = getSuccessMsg(SuccessMsgEnum.NewVax).getMsg();   
-            var new_vax = {Name:newVaccine.vaccine_name, Coverage:newVaccine.coverage}   
-            res.status(new_res_msg.status).json({Message:new_res_msg.msg, NewVax:new_vax})
-            */ 
+        .then((newBatch:any) => {
+            const new_res_msg = getSuccessMsg(SuccessMsgEnum.NewBatchWithNDosesSuccessMsg).getMsg();   
+            var new_batch = {Batch:newBatch.batch, Doses:newBatch.doses, DeliveryDate:newBatch.delivery_date, Vaccine:newBatch.vaccine_id, ExpirationDate:newBatch.expiration_date}   
+            res.status(new_res_msg.status).json({Message:new_res_msg.msg, NewBatch:new_batch})
+             
         });
     }catch (error:any) {
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);

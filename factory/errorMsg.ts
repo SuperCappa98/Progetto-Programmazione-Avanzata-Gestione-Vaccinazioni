@@ -2,11 +2,11 @@ import {Msg} from "./Msg";
 const { StatusCode } = require('status-code-enum')
 
 
-class BadFormattedPayloadErrorMsg implements Msg{
-    getMsg(): { status: number; msg: string; } {
+class MissingTokenErrorMsg implements Msg{
+    getMsg(): { status: number,  msg: string } {
         return {
             status: StatusCode.ClientErrorBadRequest,
-            msg: "Bad Request - Formatting Error: payload is bad formatted"
+            msg: "Bad Request - Request header undefined: missing JWT Token"
         }
     }
 }
@@ -20,15 +20,6 @@ class NoHeaderErrorMsg implements Msg{
     }
 }
 
-class MissingTokenErrorMsg implements Msg{
-    getMsg(): { status: number,  msg: string } {
-        return {
-            status: StatusCode.ClientErrorBadRequest,
-            msg: "Bad Request - Request header undefined: missing JWT Token"
-        }
-    }
-}
-
 class InvalidTokenErrorMsg implements Msg{
     getMsg(): { status: number,  msg: string } {
         return {
@@ -38,7 +29,7 @@ class InvalidTokenErrorMsg implements Msg{
     }
 }
 
-class BadFormattedUserDataErrorMsg implements Msg{
+class BadFormattedUserDataInJWTPayloadErrorMsg implements Msg{
     getMsg(): { status: number,  msg: string } {
         return {
             status: StatusCode.ClientErrorBadRequest,
@@ -65,54 +56,80 @@ class InternalServerErrorMsg implements Msg{
     }
 }
 
-class VaxNameErrorMsg implements Msg{
+class FieldValueAlreadyExistsErrorMsg implements Msg{
     getMsg(): { status: number; msg: string; } {
         return {
             status: StatusCode.ClientErrorConflict,
-            msg: "Conflict - Vaccine name already exists"
+            msg: "Conflict - This field value already exists"
         }
     }
 }
 
-class BadFormattedVaxDataErrorMsg implements Msg{
+class BadFormattedDataErrorMsg implements Msg{
     getMsg(): { status: number,  msg: string } {
         return {
             status: StatusCode.ClientErrorBadRequest,
-            msg: "Bad Request - Formatting Error: vaccine data are bad formatted"
+            msg: "Bad Request - Formatting Error: data are bad formatted"
+        }
+    }
+}
+
+class NotValidValueErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorBadRequest,
+            msg: "Bad Request - Not Valid Value Error"
+        }
+    }
+}
+
+class NotFoundInDBErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorNotFound,
+            msg: "Not found - Not found relative field value in the database"
+        }
+    }
+}
+
+class NotPositiveIntErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorBadRequest,
+            msg: "Bad Request - Not Positive Int Error: this field must be a positive integer"
         }
     }
 }
 
 
 export enum ErrorMsgEnum {
-    BadFormattedPayload,
-    NoHeader,
     MissingToken,
+    NoHeader,
     InvalidToken,
-    BadFormattedUserData,
+    BadFormattedUserDataInJWTPayload,
     Unauthorized,
     InternalServer,
-    VaxName,
-    BadFormattedVaxData
+    FieldValueAlreadyExists,
+    BadFormattedData,
+    NotValidValue,
+    NotFoundInDB,
+    NotPositiveInt
 }
 
 export function getErrorMsg(type: ErrorMsgEnum): Msg{
     let msgval: Msg;
     switch(type){
-        case ErrorMsgEnum.BadFormattedPayload:
-            msgval = new BadFormattedPayloadErrorMsg();
+        case ErrorMsgEnum.MissingToken:
+            msgval = new MissingTokenErrorMsg();
             break;
         case ErrorMsgEnum.NoHeader:
             msgval = new NoHeaderErrorMsg();
             break;
-        case ErrorMsgEnum.MissingToken:
-            msgval = new MissingTokenErrorMsg();
-            break;
         case ErrorMsgEnum.InvalidToken:
             msgval = new InvalidTokenErrorMsg();
             break;
-        case ErrorMsgEnum.BadFormattedUserData:
-            msgval = new BadFormattedUserDataErrorMsg();
+        case ErrorMsgEnum.BadFormattedUserDataInJWTPayload:
+            msgval = new BadFormattedUserDataInJWTPayloadErrorMsg();
             break;
         case ErrorMsgEnum.Unauthorized:
             msgval = new UnauthorizedErrorMsg();
@@ -120,11 +137,20 @@ export function getErrorMsg(type: ErrorMsgEnum): Msg{
         case ErrorMsgEnum.InternalServer:
             msgval = new InternalServerErrorMsg();
             break;
-        case ErrorMsgEnum.VaxName:
-            msgval = new VaxNameErrorMsg();
+        case ErrorMsgEnum.FieldValueAlreadyExists:
+            msgval = new FieldValueAlreadyExistsErrorMsg();
             break;
-        case ErrorMsgEnum.BadFormattedVaxData:
-            msgval = new BadFormattedVaxDataErrorMsg();
+        case ErrorMsgEnum.BadFormattedData:
+            msgval = new BadFormattedDataErrorMsg();
+            break;
+        case ErrorMsgEnum.NotValidValue:
+            msgval = new NotValidValueErrorMsg();
+            break;
+        case ErrorMsgEnum.NotFoundInDB:
+            msgval = new NotFoundInDBErrorMsg();
+            break;
+        case ErrorMsgEnum.NotPositiveInt:
+            msgval = new NotPositiveIntErrorMsg();
             break;
     }
     console.log(msgval);
