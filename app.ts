@@ -3,7 +3,7 @@
 import express from "express";
 import * as controller from './controller/controller';
 import * as CoR from './middleware/CoR';
-import {ErrorMsgEnum, getErrorMsg} from "./factory/errorMsg";
+import {SuccessMsgEnum, getSuccessMsg} from "./factory/successMsg";
 
 
 
@@ -23,9 +23,10 @@ app.use(CoR.jwt);
 // Check token payload
 app.use(CoR.jwtPayload);
 
- // Route to check service
- app.get('/', (req:any,res:any) => {
-    res.send('app is running & your token is valid & well formatted!');
+// Route to check service
+app.get('/', (req:any,res:any) => {
+    const res_msg = getSuccessMsg(SuccessMsgEnum.AppStarted).getMsg();   
+    res.status(res_msg.status).json({Message:res_msg.msg})
 });
 
 // Route to add vaccine

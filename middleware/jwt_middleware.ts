@@ -59,7 +59,7 @@ export const checkJwtPayload = (req: any, res: any, next: any) => {
     if((req.user.role === "Admin" || req.user.role === "User") && (typeof req.user.name === "string") && (typeof req.user.surname === "string") && (req.user.userKey.length === 16) ){
         next();
     }else{
-        next(ErrorMsgEnum.BadFormattedUserData);
+        next(ErrorMsgEnum.BadFormattedUserDataInJWTPayload);
     }
 
 };
