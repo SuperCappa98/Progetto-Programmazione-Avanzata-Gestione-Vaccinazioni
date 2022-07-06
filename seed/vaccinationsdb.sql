@@ -99,7 +99,7 @@ CREATE TABLE vaccination (
 --
 
 ALTER TABLE vaccination
-  ADD PRIMARY KEY (batch, delivery_date, vaccine, user_key),
+  ADD PRIMARY KEY (batch, delivery_date, vaccine, user_key, timestamp_vc),
   ADD CONSTRAINT vaccination_FK_batch FOREIGN KEY(batch, delivery_date, vaccine) REFERENCES batch(batch, delivery_date, vaccine) ON DELETE RESTRICT ON UPDATE CASCADE,
   ADD CONSTRAINT vaccination_FK_users FOREIGN KEY(user_key) REFERENCES users(user_key) ON DELETE RESTRICT ON UPDATE CASCADE;
 
