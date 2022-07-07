@@ -51,7 +51,8 @@ export const checkVaccinationData = [
     vaxMiddleware.checkUserKey,
     vaxMiddleware.checkBatchValue,
     vaxMiddleware.checkBatchKey,
-    // vaxMiddleware.checkBatchAvailability,
-   
+    vaxMiddleware.checkBatchAvailability,
+    vaxMiddleware.checkBatchNotExpired,
+    vaxMiddleware.checkUserNotCovered,
     errorHandler.errorHandler
 ]

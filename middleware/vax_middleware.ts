@@ -4,6 +4,10 @@ import { Batch } from "../models/Batch";
 import { Delivery } from "../models/Delivery";
 import { send } from "process";
 import { Vaccination } from "../models/Vaccination";
+import { User } from "../models/User";
+const Sequelize = require('sequelize');
+
+
 
 
 // Check vax data types and check no other vaccine in db with the same name
@@ -97,7 +101,6 @@ export const checkDelivery = async (req: any, res: any, next: any) => {
 // Check if batch in db: expiration date == req.expiration date
 export const checkBatchExpiration = async (req: any, res: any, next: any) => {
     const batch = req.body.batch.toUpperCase();
-    const delivery_date = new Date(req.body.delivery_date);
 
     await Batch.findOne({
         where: {
@@ -239,18 +242,16 @@ export const checkUserKey = async (req:any, res:any, next:any) => {
     }
 }
 
-// Check vaccine id, batch, delivery date values
+
+// Check vaccine id, batch values
 export const checkBatchKey = async (req: any, res: any, next: any) => {
-    const delivery_date = new Date (req.body.delivery_date);
-    console.log(delivery_date);
-    console.log(delivery_date.getDate());
-    if(Number.isInteger(req.body.vaccine_id) && req.body.vaccine_id>0 && delivery_date.getDate() ){
+    if(Number.isInteger(req.body.vaccine_id) && req.body.vaccine_id>0){
         const batch = req.body.batch.toUpperCase();
-        const batchInDb = await Batch.findOne({where: {vaccine: req.body.vaccine_id, batch: batch, delivery_date: delivery_date}});
+        const batchInDb = await Batch.findOne({where: {vaccine: req.body.vaccine_id, batch: batch}});
         if(batchInDb !== null){
-            next()
+            next();
         }else{
-            let error = new Error("batch not found in db (batch/vaccine/delivery)");
+            let error = new Error("batch not found in table batch (batch/vaccine)");
             res.send(error.message);
         }
     }else{
@@ -259,3 +260,96 @@ export const checkBatchKey = async (req: any, res: any, next: any) => {
     }
           
 };
+
+// Check batch availability in db
+export const checkBatchAvailability = async (req: any, res: any, next: any) => {
+    const batch = req.body.batch.toUpperCase();
+
+    await Batch.findOne({where: {vaccine:req.body.vaccine_id, batch:batch}}).then((r) => {
+        let json = JSON.parse(JSON.stringify(r));
+        console.log("json:", json.available_doses);
+        if(json.available_doses > 0){
+            next();
+        }else{
+            let error = new Error("there are no more doses of this batch!");
+            res.send(error.message);
+        };
+    });
+
+          
+};
+
+// Check timestamp value (format and > than today) and batch not expired
+export const checkBatchNotExpired = async (req: any, res: any, next: any) => {
+    console.log("req.body.timestamp_vc:", req.body.timestamp_vc)
+    if(req.body.timestamp_vc !== null && isNaN(req.body.timestamp_vc)){
+        const today = new Date();
+        const timestamp_vc = new Date(req.body.timestamp_vc);
+        if(timestamp_vc.getDate() && timestamp_vc.getTime() <= today.getTime()){
+            
+            const batch = req.body.batch.toUpperCase();
+            await Batch.findOne({where: {vaccine:req.body.vaccine_id, batch:batch}}).then((r) => {
+                let json = JSON.parse(JSON.stringify(r));
+                console.log("json:", json.expiration_date);
+                const expiration_date = new Date(json.expiration_date); // need to compare date with timestamp
+                if(expiration_date.getTime() >= timestamp_vc.getTime()){
+                    next();
+                }else{
+                    let error = new Error("batch is expired");
+                    res.send(error.message);
+                };
+            });
+        }else{
+            let error = new Error("you can't add vaccination with future date");
+            res.send(error.message);
+        }
+    } else{
+        let error = new Error("timestamp null or not string");
+        res.send(error.message);
+    }     
+};
+
+
+// check if user still covered by req.vaccine
+export const checkUserNotCovered = async (req: any, res: any, next: any) => {
+    const batch = req.body.batch.toUpperCase();
+    await Vaccination.findAll({ attributes:[[Sequelize.fn('max', Sequelize.col('timestamp_vc')),'max']], where: {vaccine:req.body.vaccine_id, user_key:req.body.user_key}}).then(async (last_vaccination) => { // get last vaccination
+        if(last_vaccination !== null){
+            
+            console.log("last vaccination before parsing:", last_vaccination);
+            const json = JSON.parse(JSON.stringify(last_vaccination));
+            // last_vaccination = json.timestamp_vc;
+            console.log("last vaccination post parsing:", json[0].max);
+            const last_timestamp = json[0].max;
+            let date_last_vaccination = new Date(last_timestamp);
+            console.log("last vaccination post parsing and post new Date:", date_last_vaccination);
+            console.log("last vaccination post parsing and post new Date - GET DATE:", date_last_vaccination.getDate());
+
+            await Vaccine.findOne({attributes: ["coverage"], where: {vaccine_id:req.body.vaccine_id} }).then((vax_coverage => { // find vax coverage
+                const parsed_coverage = JSON.parse(JSON.stringify(vax_coverage));
+                console.log("coverage:",parsed_coverage.coverage);
+                date_last_vaccination.setDate(date_last_vaccination.getDate() + parsed_coverage.coverage); // add coverage days to last vaccination
+                let end_coverage_date = new Date();
+                end_coverage_date = date_last_vaccination; 
+                console.log("end_coverage_date:", end_coverage_date);
+                console.log("req.body.timestamp_vc:", req.body.timestamp_vc);
+                const timestamp_vc = new Date(req.body.timestamp_vc);
+                console.log("timestamp_vc:", timestamp_vc);
+                console.log("end_coverage_date GET TIME:", end_coverage_date.getTime);
+                console.log("timestamp_vc GET TIME:", timestamp_vc.getTime);
+                
+
+                if(end_coverage_date.getTime() < timestamp_vc.getTime()){
+                    next(); // user not more covered -> we can do vaccination
+                }else{
+                    let error = new Error("User is still covered");
+                    res.send(error.message);
+                }
+            }));
+        }else{
+            console.log("last vaccination:", last_vaccination);
+            next(); // no other vaccinations with that vaccine -> user not covered!
+        }
+    })
+}
+

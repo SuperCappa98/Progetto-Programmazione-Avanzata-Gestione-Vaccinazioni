@@ -49,8 +49,8 @@ app.get('/vaxList', CoR.checkAdmin, CoR.vaxFilters, (req:any,res:any) => {
 });
 
 app.post('/addVaccination', CoR.checkAdmin, CoR.checkVaccinationData, (req:any,res:any) => {
-    // controller.addVaxDoses(req.body.doses, req.body.batch, req.body.delivery_date, req.body.expiration_date, req.body.vaccine_id, res);
-    res.send("ok, you can add vaccination")
+    controller.addVaccination(req.body.vaccine_id, req.body.batch, req.body.user_key, req.body.timestamp_vc, res);
+    //es.send("ok, you can add vaccination")
 });
 
 

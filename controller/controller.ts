@@ -6,6 +6,7 @@ import { Batch } from '../models/Batch';
 import { Delivery } from '../models/Delivery';
 import { DBSingleton } from "../singleton/DBSingleton";
 import { QueryTypes, Sequelize } from 'sequelize';
+import { Vaccination } from '../models/Vaccination';
 
 const sequelize: Sequelize = DBSingleton.getConnection();
 
@@ -460,3 +461,20 @@ export async function vaxList(vax_name: Array<string>, availability: Array<numbe
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
     }
 }
+
+
+// add vaccination and decrement available doses in batch table
+export async function addVaccination(vaccine_id:number, batch:string, user_key:string, timestamp_vc:Date, res:any){
+    try{
+        batch = batch.toUpperCase();
+        user_key = user_key.toUpperCase();
+        await Vaccination.create({vaccine:vaccine_id, batch:batch, user_key:user_key, timestamp_vc:timestamp_vc}).then(async ()=>{
+            await Batch.decrement(["available_doses"], {by:1, where:{vaccine:vaccine_id, batch:batch}});
+        }).then(()=>{res.send("you have just inserted vaccination and decrement available doses in batch table!")})
+        
+    }catch(error:any){
+        controllerErrors(ErrorMsgEnum.InternalServer, error, res);
+    }
+}
+
+
