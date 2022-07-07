@@ -6,7 +6,6 @@ import * as CoR from './middleware/CoR';
 import {SuccessMsgEnum, getSuccessMsg} from "./factory/successMsg";
 
 
-
 // Creating express object (in this case, the app)
 const app = express();
 
@@ -37,7 +36,16 @@ app.post('/addVax', CoR.checkAdmin, CoR.checkVaxData, (req:any,res:any) => {
 // Route to add N doses of a vaccine
 app.post('/addDoses', CoR.checkAdmin, CoR.checkDosesData, (req:any,res:any) => {
    controller.addVaxDoses(req.body.delivery_doses, req.body.batch, req.body.delivery_date, req.body.expiration_date, req.body.vaccine_id, res);
-   //res.send("ok, you can add vaccination")
+});
+
+// Route to display list of vaccines that can be filtered by name, availability, and/or expiration date
+app.get('/vaxList', CoR.checkAdmin, CoR.vaxFilters, (req:any,res:any) => {
+    
+    if(!Object.keys(req.body).includes('vax_name')) req.body.vax_name = null;
+    if(!Object.keys(req.body).includes('availability')) req.body.availability = null;
+    if(!Object.keys(req.body).includes('expiration_date')) req.body.expiration_date = null;
+    controller.vaxList(req.body.vax_name, req.body.availability, req.body.expiration_date, res);
+    
 });
 
 app.post('/addVaccination', CoR.checkAdmin, CoR.checkVaccinationData, (req:any,res:any) => {

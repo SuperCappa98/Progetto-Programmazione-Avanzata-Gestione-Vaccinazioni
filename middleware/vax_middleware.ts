@@ -94,7 +94,6 @@ export const checkDelivery = async (req: any, res: any, next: any) => {
     }      
 };
 
-
 // Check if batch in db: expiration date == req.expiration date
 export const checkBatchExpiration = async (req: any, res: any, next: any) => {
     const batch = req.body.batch.toUpperCase();
@@ -121,9 +120,107 @@ export const checkBatchExpiration = async (req: any, res: any, next: any) => {
     });
 }
 
+export const checkFilterVaxName = async (req: any, res: any, next: any) => {
+    if(req.body.vax_name == null) {
+        next();
+    }else if(Array.isArray(req.body.vax_name)) {
+        var string_bool = true;
+        req.body.vax_name.forEach((vax_name:any) => {
+            if(typeof vax_name !== "string"){
+                string_bool = false;
+            }
+        });
+        if(string_bool) {
+            var exist_bool = true;
+            for (let i = 0; i < req.body.vax_name.length; i++) {
+                const vax_name = req.body.vax_name[i];
+                const vaxName = vax_name.toLowerCase();
+                const vax_name_db = await Vaccine.findOne({ where: {vaccine_name: vaxName}});
+                if(vax_name_db === null){
+                    exist_bool = false;
+                }
+            }
+            if(exist_bool){
+                next();
+            }else{
+                next(ErrorMsgEnum.NotFoundInDB);
+            }
+        }else{
+            next(ErrorMsgEnum.NotValidValue);
+        }
+    }else{
+        next(ErrorMsgEnum.NotValidValue);
+    }
+};
 
+export const checkFilterAvailability = (req: any, res: any, next: any) => {
+    if(req.body.availability == null) {
+        next();
+    }else if(Array.isArray(req.body.availability)) {
+        if(req.body.availability.length === 2){
+            var number_bool = true;
+            req.body.availability.forEach((number:any) => {
+                if(typeof number !== "number" && number !== null){
+                    number_bool = false;
+                }
+            });
+            if(number_bool) {
+                if((req.body.availability[0] === null && req.body.availability[1]>=0) ||
+                    (req.body.availability[0]>=0 && req.body.availability[1] === null) ||
+                    (req.body.availability[0]>=0 && req.body.availability[1]>=0 
+                        && req.body.availability[1]>req.body.availability[0])){
+                    next();
+                }else{
+                    next(ErrorMsgEnum.NotValidValue);
+                }
+            }else{
+                next(ErrorMsgEnum.NotValidValue);
+            }
+        }else{
+            next(ErrorMsgEnum.InvalidArrayLength);
+        }
+    }else{
+        next(ErrorMsgEnum.NotValidValue);
+    }
+};
 
-
+export const checkFilterExpirationDate = (req: any, res: any, next: any) => {
+    if(req.body.expiration_date == null) {
+        next();
+    }else if(Array.isArray(req.body.expiration_date)) {
+        if(req.body.expiration_date.length === 2){
+            if(req.body.expiration_date[0] === null && isNaN(req.body.expiration_date[1])){
+                const expiration_date = new Date(req.body.expiration_date[1]);
+                if(expiration_date.getDate()){                    
+                    next();
+                }else{
+                    next(ErrorMsgEnum.NotValidValue);
+                }
+            }else if(isNaN(req.body.expiration_date[0]) && req.body.expiration_date[1] === null){
+                const expiration_date = new Date(req.body.expiration_date[0]);
+                if(expiration_date.getDate()){                    
+                    next();
+                }else{
+                    next(ErrorMsgEnum.NotValidValue);
+                }
+            }else if(isNaN(req.body.expiration_date[0]) && isNaN(req.body.expiration_date[1])){
+                const min_expiration_date = new Date(req.body.expiration_date[0]);
+                const max_expiration_date = new Date(req.body.expiration_date[1]);
+                if(min_expiration_date.getDate() && max_expiration_date.getDate() && max_expiration_date.getTime()>min_expiration_date.getTime()){                    
+                    next();
+                }else{
+                    next(ErrorMsgEnum.NotValidValue);
+                }
+            }else{
+                next(ErrorMsgEnum.NotValidValue);
+            }
+        }else{
+            next(ErrorMsgEnum.InvalidArrayLength);
+        }
+    }else{
+        next(ErrorMsgEnum.NotValidValue);
+    }
+};
 
 // Check user key format and user key value in the db
 export const checkUserKey = async (req:any, res:any, next:any) => {

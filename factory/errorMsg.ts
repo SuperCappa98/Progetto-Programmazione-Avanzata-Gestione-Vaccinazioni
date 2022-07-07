@@ -101,6 +101,15 @@ class NotPositiveIntErrorMsg implements Msg{
     }
 }
 
+class InvalidArrayLengthErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorBadRequest,
+            msg: "Bad Request - Range Error: invalid array length"
+        }
+    }
+}
+
 
 export enum ErrorMsgEnum {
     MissingToken,
@@ -113,7 +122,8 @@ export enum ErrorMsgEnum {
     BadFormattedData,
     NotValidValue,
     NotFoundInDB,
-    NotPositiveInt
+    NotPositiveInt,
+    InvalidArrayLength
 }
 
 export function getErrorMsg(type: ErrorMsgEnum): Msg{
@@ -152,7 +162,9 @@ export function getErrorMsg(type: ErrorMsgEnum): Msg{
         case ErrorMsgEnum.NotPositiveInt:
             msgval = new NotPositiveIntErrorMsg();
             break;
-    }
+        case ErrorMsgEnum.InvalidArrayLength:
+            msgval = new InvalidArrayLengthErrorMsg();
+}
     console.log(msgval);
     return msgval;
 }

@@ -20,11 +20,20 @@ class NewVaxSuccessMsg implements Msg{
     }
 }
 
-class NewBatchWithNDosesSuccessMsg implements Msg{
+class NewDeliveryWithNDosesSuccessMsg implements Msg{
     getMsg(): { status: number; msg: string; } {
         return {
             status: StatusCode.SuccessCreated,
-            msg: "Success Created - New batch with the required number of doses created successfully"
+            msg: "Success Created - New delivery with the required number of doses created successfully"
+        }
+    }
+}
+
+class VaxListSuccessMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.SuccessOK,
+            msg: "Success OK - Vax list is successfully displayed"
         }
     }
 }
@@ -33,7 +42,8 @@ class NewBatchWithNDosesSuccessMsg implements Msg{
 export enum SuccessMsgEnum {
     AppStarted,
     NewVax,
-    NewBatchWithNDosesSuccessMsg
+    NewDeliveryWithNDosesSuccessMsg,
+    VaxList
 }
 
 export function getSuccessMsg(type: SuccessMsgEnum): Msg{
@@ -45,8 +55,11 @@ export function getSuccessMsg(type: SuccessMsgEnum): Msg{
         case SuccessMsgEnum.NewVax:
             msgval = new NewVaxSuccessMsg();
             break;
-        case SuccessMsgEnum.NewBatchWithNDosesSuccessMsg:
-            msgval = new NewBatchWithNDosesSuccessMsg();
+        case SuccessMsgEnum.NewDeliveryWithNDosesSuccessMsg:
+            msgval = new NewDeliveryWithNDosesSuccessMsg();
+            break;
+        case SuccessMsgEnum.VaxList:
+            msgval = new VaxListSuccessMsg();
             break;
     }
     return msgval;
