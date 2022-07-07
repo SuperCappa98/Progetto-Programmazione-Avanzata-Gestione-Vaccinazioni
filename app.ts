@@ -36,7 +36,13 @@ app.post('/addVax', CoR.checkAdmin, CoR.checkVaxData, (req:any,res:any) => {
 
 // Route to add N doses of a vaccine
 app.post('/addDoses', CoR.checkAdmin, CoR.checkDosesData, (req:any,res:any) => {
-    controller.addVaxDoses(req.body.doses, req.body.batch, req.body.delivery_date, req.body.expiration_date, req.body.vaccine_id, res);
+   controller.addVaxDoses(req.body.delivery_doses, req.body.batch, req.body.delivery_date, req.body.expiration_date, req.body.vaccine_id, res);
+   //res.send("ok, you can add vaccination")
+});
+
+app.post('/addVaccination', CoR.checkAdmin, CoR.checkVaccinationData, (req:any,res:any) => {
+    // controller.addVaxDoses(req.body.doses, req.body.batch, req.body.delivery_date, req.body.expiration_date, req.body.vaccine_id, res);
+    res.send("ok, you can add vaccination")
 });
 
 

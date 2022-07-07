@@ -9,10 +9,6 @@ export const Vaccination = sequelize.define('vaccination', {
         type: DataTypes.STRING(50),
         primaryKey: true
     },
-    delivery_date: {
-        type: DataTypes.DATE(),
-        primaryKey: true
-    },
     vaccine: {
         type: DataTypes.INTEGER(),
         primaryKey: true

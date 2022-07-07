@@ -12,6 +12,7 @@ export const Vaccine = sequelize.define('vaccine', {
     },
     vaccine_name: {
         type: DataTypes.STRING(30),
+        unique: true,
         allowNull: false
     },
     coverage: {

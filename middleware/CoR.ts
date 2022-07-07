@@ -36,5 +36,15 @@ export const checkDosesData = [
     vaxMiddleware.checkExpirationDate,
     vaxMiddleware.checkVaccineId,
     vaxMiddleware.checkDelivery,
+    vaxMiddleware.checkBatchExpiration,
+    errorHandler.errorHandler
+]
+
+export const checkVaccinationData = [
+    vaxMiddleware.checkUserKey,
+    vaxMiddleware.checkBatchValue,
+    vaxMiddleware.checkBatchKey,
+    // vaxMiddleware.checkBatchAvailability,
+   
     errorHandler.errorHandler
 ]
