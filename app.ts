@@ -52,9 +52,16 @@ app.get('/availableVaxDoses', CoR.checkAdmin, CoR.checkAvailableVaxDoses, (req:a
     controller.availableVaxDoses(req.body.vax_name, req.body.availability, res);
 });
 
+// Route to add a vaccination
 app.post('/addVaccination', CoR.checkAdmin, CoR.checkVaccinationData, (req:any,res:any) => {
     controller.addVaccination(req.body.vaccine_id, req.body.batch, req.body.user_key, req.body.timestamp_vc, res);
     //es.send("ok, you can add vaccination")
+});
+
+// Route to download user vaccinations in PDF
+app.get('/downloadPDF', CoR.checkTokenField, (req:any,res:any) => {
+    controller.downloadPDF(req.user, res);
+    //res.send("ok, you can pass to controller")
 });
 
 

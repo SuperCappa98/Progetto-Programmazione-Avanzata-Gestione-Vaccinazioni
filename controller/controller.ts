@@ -7,6 +7,9 @@ import { Delivery } from '../models/Delivery';
 import { DBSingleton } from "../singleton/DBSingleton";
 import { QueryTypes, Sequelize } from 'sequelize';
 import { Vaccination } from '../models/Vaccination';
+import { generateCustomerInformation, generateHeader, generateInvoiceTable } from '../utils/generate_pdf';
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
 const sequelize: Sequelize = DBSingleton.getConnection();
 
@@ -551,6 +554,65 @@ export async function addVaccination(vaccine_id:number, batch:string, user_key:s
         const new_res_msg = getSuccessMsg(SuccessMsgEnum.NewVaccination).getMsg();
         res.status(new_res_msg.status).json({Message:new_res_msg.msg, Vaccination:vaxData});
         
+    }catch(error:any){
+        controllerErrors(ErrorMsgEnum.InternalServer, error, res);
+    }
+}
+
+// get PDF with all the vaccinations for a user
+export async function downloadPDF(req_user: any, res:any){
+    try{
+        var user_key;
+
+        if(req_user.role === "Admin"){
+            user_key = req_user.userKeyClient; // admin need to get the client key
+
+        } else {
+            user_key = req_user.userKey; // client have already his personal key in token
+        }
+
+        console.log("user_key after if: ",user_key);
+        user_key = user_key.toUpperCase();
+
+        const vaccinations = await sequelize.query(
+            'SELECT vax.vaccine_name, vax.coverage, vaxs.batch, vaxs.user_key, vaxs.timestamp_vc FROM vaccine as vax JOIN vaccination as vaxs ON (vax.vaccine_id = vaxs.vaccine) WHERE user_key = :key ORDER BY timestamp_vc DESC',
+            {
+            replacements: { key: user_key },
+            type: QueryTypes.SELECT
+            }
+        )
+
+        console.log("all vaccinations: ",vaccinations);
+        const vaccinations_json = JSON.parse(JSON.stringify(vaccinations));
+        console.log("all vaccinations PARSED: ",vaccinations_json);
+
+        let doc = new PDFDocument({ margin: 50, bufferPages:true, pdfVersion: '1.5', tagged:true, displayTitle:true});
+        console.log(doc);
+
+        // Document meta data
+        doc.info['Title'] = 'Vaccinazioni';
+    
+
+
+        let buffers: any = [];
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', () => {
+
+            let pdfData = Buffer.concat(buffers);
+            console.log(Buffer.byteLength(pdfData));
+            
+            res.writeHead(200, {
+            'Content-Length': Buffer.byteLength(pdfData),
+            'Content-Type': 'application/pdf',
+            'Content-disposition': 'attachment;filename=vaccinazioni.pdf',})
+            .end(pdfData);
+        });
+
+        generateHeader(doc);
+        generateCustomerInformation(doc, user_key);
+        generateInvoiceTable(doc, vaccinations_json);
+        doc.end(); 
+
     }catch(error:any){
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
     }

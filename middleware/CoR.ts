@@ -62,3 +62,9 @@ export const checkVaccinationData = [
     vaxMiddleware.checkUserNotCovered,
     errorHandler.errorHandler
 ]
+
+
+export const checkTokenField = [
+    vaxMiddleware.checkTokenField,
+    errorHandler.errorHandler
+]

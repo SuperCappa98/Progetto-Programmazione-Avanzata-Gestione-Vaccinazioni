@@ -2,8 +2,8 @@
 -- Database: `vaccinationsdb`
 --
 
--- CREATE DATABASE vaccinationsdb;
--- \c vaccinationsdb
+CREATE DATABASE vaccinationsdb;
+\c vaccinationsdb
 
 --
 -- Structure of "vaccine" table
@@ -56,8 +56,8 @@ INSERT INTO batch (batch, vaccine, available_doses, expiration_date)
 	('123456Z', 3, 710, '2021-07-21'),
 	('CDE7845', 1, 200, '2022-12-15'),
 	('000190A', 3, 269, '2022-12-25'),
-	('ABV2856', 1, 98, '2023-01-09'),
-	('SC2606', 2, 999, '2023-06-26'),
+	('ABV2856', 1, 97, '2023-01-09'),
+	('SC2606', 2, 998, '2023-06-26'),
   ('NODOSESBATCH', 1, 0, '2024-01-01');
 
 
@@ -115,7 +115,8 @@ INSERT INTO users (user_key)
 	VALUES
     ('GTTNDR80A03A271U'),
     ('RMGLRA71R68H501V'),
-    ('RGNGNN86E53F839L');
+    ('RGNGNN86E53F839L'),
+    ('AAABBB80A03A000U');
 
 
 -- --------------------------------------------------------
@@ -147,6 +148,8 @@ ALTER TABLE vaccination
 INSERT INTO vaccination (batch, vaccine, user_key, timestamp_vc) 
 	VALUES
 	('000190A', 3, 'GTTNDR80A03A271U', '2022-06-30 13:42:25'),
+  ('ABV2856', 1, 'GTTNDR80A03A271U', '2020-04-28 11:42:15'),
+  ('SC2606', 2, 'GTTNDR80A03A271U', '2019-05-22 19:45:05'),
   ('ABV2856', 1, 'RMGLRA71R68H501V', '2021-12-26 18:50:30'),
   ('ABV2856', 1, 'RMGLRA71R68H501V', '2019-12-26 18:50:30'),
 	('SC2606', 2, 'RGNGNN86E53F839L', '2022-02-17 14:30:00');

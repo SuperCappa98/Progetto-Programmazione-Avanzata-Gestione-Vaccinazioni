@@ -344,3 +344,19 @@ export const checkUserNotCovered = async (req: any, res: any, next: any) => {
     })
 }
 
+
+export const checkTokenField = (req: any, res: any, next: any) => {
+    console.log(req.user);
+    console.log(req.user.userKeyClient);
+    if(req.user.role === "Admin") {  // role admin -> other field in token: userKeyClient -> check format
+        if(typeof(req.user.userKeyClient) === "string" && req.user.userKeyClient.length === 16){
+            next();
+        }else{
+            let error = new Error("Invalid client user key");
+            res.send(error.message);
+        }
+    } else {
+        next(); // role = User -> no other fields to check
+    }
+}
+
