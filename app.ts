@@ -39,13 +39,17 @@ app.post('/addDoses', CoR.checkAdmin, CoR.checkDosesData, (req:any,res:any) => {
 });
 
 // Route to display list of vaccines that can be filtered by name, availability, and/or expiration date
-app.get('/vaxList', CoR.checkAdmin, CoR.vaxFilters, (req:any,res:any) => {
-    
+app.get('/vaxList', CoR.checkAdmin, CoR.checkVaxFilters, (req:any,res:any) => {
     if(!Object.keys(req.body).includes('vax_name')) req.body.vax_name = null;
     if(!Object.keys(req.body).includes('availability')) req.body.availability = null;
     if(!Object.keys(req.body).includes('expiration_date')) req.body.expiration_date = null;
     controller.vaxList(req.body.vax_name, req.body.availability, req.body.expiration_date, res);
-    
+});
+
+// Route to display whether a given vaccine has any available doses and if so also allows filtering of availability
+app.get('/availableVaxDoses', CoR.checkAdmin, CoR.checkAvailableVaxDoses, (req:any,res:any) => {
+    if(!Object.keys(req.body).includes('availability')) req.body.availability = null;
+    controller.availableVaxDoses(req.body.vax_name, req.body.availability, res);
 });
 
 app.post('/addVaccination', CoR.checkAdmin, CoR.checkVaccinationData, (req:any,res:any) => {

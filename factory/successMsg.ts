@@ -38,12 +38,51 @@ class VaxListSuccessMsg implements Msg{
     }
 }
 
+class AvailableDosesSuccessMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.SuccessOK,
+            msg: "Success OK - Doses of the required vaccine are still available"
+        }
+    }
+}
+
+class NotAvailableDosesSuccessMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.SuccessOK,
+            msg: "Success OK - No doses of the required vaccine are currently available"
+        }
+    }
+}
+
+class FilterAvailableDosesSuccessMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.SuccessOK,
+            msg: "Success OK - Given vaccine still has the required number of doses"
+        }
+    }
+}
+
+class FilterNotAvailableDosesSuccessMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.SuccessOK,
+            msg: "Success OK - Required number of doses of the given vaccine are not currently available"
+        }
+    }
+}
 
 export enum SuccessMsgEnum {
     AppStarted,
     NewVax,
-    NewDeliveryWithNDosesSuccessMsg,
-    VaxList
+    NewDeliveryWithNDoses,
+    VaxList,
+    AvailableDoses,
+    NotAvailableDoses,
+    FilterAvailableDoses,
+    FilterNotAvailableDoses
 }
 
 export function getSuccessMsg(type: SuccessMsgEnum): Msg{
@@ -55,11 +94,23 @@ export function getSuccessMsg(type: SuccessMsgEnum): Msg{
         case SuccessMsgEnum.NewVax:
             msgval = new NewVaxSuccessMsg();
             break;
-        case SuccessMsgEnum.NewDeliveryWithNDosesSuccessMsg:
+        case SuccessMsgEnum.NewDeliveryWithNDoses:
             msgval = new NewDeliveryWithNDosesSuccessMsg();
             break;
         case SuccessMsgEnum.VaxList:
             msgval = new VaxListSuccessMsg();
+            break;
+        case SuccessMsgEnum.AvailableDoses:
+            msgval = new AvailableDosesSuccessMsg();
+            break;
+        case SuccessMsgEnum.NotAvailableDoses:
+            msgval = new NotAvailableDosesSuccessMsg();
+            break;
+        case SuccessMsgEnum.FilterAvailableDoses:
+            msgval = new FilterAvailableDosesSuccessMsg();
+            break;
+        case SuccessMsgEnum.FilterNotAvailableDoses:
+            msgval = new FilterNotAvailableDosesSuccessMsg();
             break;
     }
     return msgval;

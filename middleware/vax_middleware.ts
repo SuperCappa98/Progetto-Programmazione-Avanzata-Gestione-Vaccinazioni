@@ -168,10 +168,11 @@ export const checkFilterAvailability = (req: any, res: any, next: any) => {
                 }
             });
             if(number_bool) {
-                if((req.body.availability[0] === null && req.body.availability[1]>=0) ||
+                if(((req.body.availability[0] === null && req.body.availability[1]>=0) ||
                     (req.body.availability[0]>=0 && req.body.availability[1] === null) ||
                     (req.body.availability[0]>=0 && req.body.availability[1]>=0 
-                        && req.body.availability[1]>req.body.availability[0])){
+                        && req.body.availability[1]>req.body.availability[0])) 
+                        && !(req.body.availability[0] === null && req.body.availability[1] === null)){
                     next();
                 }else{
                     next(ErrorMsgEnum.NotValidValue);
@@ -219,6 +220,20 @@ export const checkFilterExpirationDate = (req: any, res: any, next: any) => {
             }
         }else{
             next(ErrorMsgEnum.InvalidArrayLength);
+        }
+    }else{
+        next(ErrorMsgEnum.NotValidValue);
+    }
+};
+
+export const checkVaxName = async (req: any, res: any, next: any) => {
+    if(typeof req.body.vax_name === "string") {
+        const vax_name = req.body.vax_name.toLowerCase();
+        const vaxName = await Vaccine.findOne({ where: {vaccine_name: vax_name}});
+        if(vaxName !== null){
+            next();
+        }else{
+            next(ErrorMsgEnum.NotFoundInDB);
         }
     }else{
         next(ErrorMsgEnum.NotValidValue);

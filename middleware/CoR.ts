@@ -40,10 +40,16 @@ export const checkDosesData = [
     errorHandler.errorHandler
 ]
 
-export const vaxFilters = [
+export const checkVaxFilters = [
     vaxMiddleware.checkFilterVaxName,
     vaxMiddleware.checkFilterAvailability,
     vaxMiddleware.checkFilterExpirationDate,
+    errorHandler.errorHandler
+]
+
+export const checkAvailableVaxDoses = [
+    vaxMiddleware.checkVaxName,
+    vaxMiddleware.checkFilterAvailability,
     errorHandler.errorHandler
 ]
 
