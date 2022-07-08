@@ -546,9 +546,10 @@ export async function addVaccination(vaccine_id:number, batch:string, user_key:s
     try{
         batch = batch.toUpperCase();
         user_key = user_key.toUpperCase();
-        await Vaccination.create({vaccine:vaccine_id, batch:batch, user_key:user_key, timestamp_vc:timestamp_vc}).then(async ()=>{
-            await Batch.decrement(["available_doses"], {by:1, where:{vaccine:vaccine_id, batch:batch}});
-        }).then(()=>{res.send("you have just inserted vaccination and decrement available doses in batch table!")})
+        const vaxData = await Vaccination.create({vaccine:vaccine_id, batch:batch, user_key:user_key, timestamp_vc:timestamp_vc});
+        await Batch.decrement(["available_doses"], {by:1, where:{vaccine:vaccine_id, batch:batch}});
+        const new_res_msg = getSuccessMsg(SuccessMsgEnum.NewVaccination).getMsg();
+        res.status(new_res_msg.status).json({Message:new_res_msg.msg, Vaccination:vaxData});
         
     }catch(error:any){
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);

@@ -60,7 +60,7 @@ class FieldValueAlreadyExistsErrorMsg implements Msg{
     getMsg(): { status: number; msg: string; } {
         return {
             status: StatusCode.ClientErrorConflict,
-            msg: "Conflict - This field value already exists"
+            msg: "Conflict - Field value already exists"
         }
     }
 }
@@ -101,11 +101,47 @@ class NotPositiveIntErrorMsg implements Msg{
     }
 }
 
+class FieldValueNotMatchErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorConflict,
+            msg: "Conflict - Field value don't match with data in the database"
+        }
+    }
+}
+
 class InvalidArrayLengthErrorMsg implements Msg{
     getMsg(): { status: number; msg: string; } {
         return {
             status: StatusCode.ClientErrorBadRequest,
             msg: "Bad Request - Range Error: invalid array length"
+        }
+    }
+}
+
+class NoMoreDosesInBatchErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorConflict,
+            msg: "Conflict - No more doses in this batch"
+        }
+    }
+}
+
+class DosesInBatchExpiredErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorConflict,
+            msg: "Conflict - Doses in this batch are expired"
+        }
+    }
+}
+
+class UserStillCoveredErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorConflict,
+            msg: "Conflict - User is still covered with this vaccine"
         }
     }
 }
@@ -123,7 +159,11 @@ export enum ErrorMsgEnum {
     NotValidValue,
     NotFoundInDB,
     NotPositiveInt,
-    InvalidArrayLength
+    FieldValueNotMatch,
+    InvalidArrayLength,
+    NoMoreDosesInBatch,
+    DosesInBatchExpired,
+    UserStillCovered
 }
 
 export function getErrorMsg(type: ErrorMsgEnum): Msg{
@@ -162,9 +202,21 @@ export function getErrorMsg(type: ErrorMsgEnum): Msg{
         case ErrorMsgEnum.NotPositiveInt:
             msgval = new NotPositiveIntErrorMsg();
             break;
+        case ErrorMsgEnum.FieldValueNotMatch:
+            msgval = new FieldValueNotMatchErrorMsg();
+            break;
         case ErrorMsgEnum.InvalidArrayLength:
             msgval = new InvalidArrayLengthErrorMsg();
+            break;
+        case ErrorMsgEnum.NoMoreDosesInBatch:
+            msgval = new NoMoreDosesInBatchErrorMsg();
+            break;
+        case ErrorMsgEnum.DosesInBatchExpired:
+            msgval = new DosesInBatchExpiredErrorMsg();
+            break;
+        case ErrorMsgEnum.UserStillCovered:
+            msgval = new UserStillCoveredErrorMsg();
+            break;
 }
-    console.log(msgval);
     return msgval;
 }

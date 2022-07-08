@@ -74,6 +74,15 @@ class FilterNotAvailableDosesSuccessMsg implements Msg{
     }
 }
 
+class NewVaccinationSuccessMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.SuccessCreated,
+            msg: "Succes Created - New vaccination inserted successfully and available doses decremented in the respective batch"
+        }
+    }
+}
+
 export enum SuccessMsgEnum {
     AppStarted,
     NewVax,
@@ -82,7 +91,8 @@ export enum SuccessMsgEnum {
     AvailableDoses,
     NotAvailableDoses,
     FilterAvailableDoses,
-    FilterNotAvailableDoses
+    FilterNotAvailableDoses,
+    NewVaccination
 }
 
 export function getSuccessMsg(type: SuccessMsgEnum): Msg{
@@ -111,6 +121,9 @@ export function getSuccessMsg(type: SuccessMsgEnum): Msg{
             break;
         case SuccessMsgEnum.FilterNotAvailableDoses:
             msgval = new FilterNotAvailableDosesSuccessMsg();
+            break;
+        case SuccessMsgEnum.NewVaccination:
+            msgval = new NewVaccinationSuccessMsg();
             break;
     }
     return msgval;
