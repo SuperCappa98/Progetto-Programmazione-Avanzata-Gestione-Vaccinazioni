@@ -92,6 +92,15 @@ class VaccinationsListSuccessMsg implements Msg{
     }
 }
 
+class CoverageExpiredUserListSuccessMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.SuccessOK,
+            msg: "Success OK - Coverage expired user list is successfully displayed"
+        }
+    }
+}
+
 export enum SuccessMsgEnum {
     AppStarted,
     NewVax,
@@ -102,7 +111,8 @@ export enum SuccessMsgEnum {
     FilterAvailableDoses,
     FilterNotAvailableDoses,
     NewVaccination,
-    VaccinationsList
+    VaccinationsList,
+    CoverageExpiredUserList
 }
 
 export function getSuccessMsg(type: SuccessMsgEnum): Msg{
@@ -137,6 +147,9 @@ export function getSuccessMsg(type: SuccessMsgEnum): Msg{
             break;
         case SuccessMsgEnum.VaccinationsList:
             msgval = new VaccinationsListSuccessMsg();
+            break;
+        case SuccessMsgEnum.CoverageExpiredUserList:
+            msgval = new CoverageExpiredUserListSuccessMsg();
             break;
     }
     return msgval;

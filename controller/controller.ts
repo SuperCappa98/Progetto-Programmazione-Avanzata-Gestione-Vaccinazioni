@@ -245,7 +245,10 @@ export async function vaxList(vax_name: Array<string>, availability: Array<numbe
             if(expiration_date[0] !== null && expiration_date[1] === null) {
                 if(availability[0] !== null && availability[1] === null) {
                     await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date > ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) > ?',
+                        `SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses 
+                        FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date > ? 
+                        GROUP BY v.vaccine_id, b.batch, b.expiration_date 
+                        HAVING sum(b.available_doses) > ?`,
                         {
                             replacements: [expiration_date[0], availability[0]],
                             type: QueryTypes.SELECT
@@ -676,7 +679,7 @@ export async function vaccinationsJson(req_user: any, vax_name:string, vaccinati
                 const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
                 res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFilteredDate});    
 
-            }else if(vaccination_date[0] !== null && vaccination_date[1] !== null){ // filter < <
+            }else if(vaccination_date[0] !== null && vaccination_date[1] !== null){ // filter >= <=
                 listFilteredDate = vaccinations_json.filter((vaccination: { timestamp_vc: Date; })  => 
                 vaccination.timestamp_vc >= vaccination_date[0] && vaccination.timestamp_vc <= vaccination_date[1]);
                 const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
@@ -696,7 +699,7 @@ export async function vaccinationsJson(req_user: any, vax_name:string, vaccinati
                 const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
                 res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFiltered});    
 
-            }else if(vaccination_date[0] !== null && vaccination_date[1] !== null){ // filter < <
+            }else if(vaccination_date[0] !== null && vaccination_date[1] !== null){ // filter >= <=
                 listFiltered = vaccinations_json.filter((vaccination: { timestamp_vc: Date; vaccine_name:string})  => 
                 vaccination.timestamp_vc >= vaccination_date[0] && vaccination.timestamp_vc <= vaccination_date[1] && vaccination.vaccine_name === vax_name);
                 const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
@@ -708,4 +711,69 @@ export async function vaccinationsJson(req_user: any, vax_name:string, vaccinati
     }
 }
 
+export async function coverageExpiredUserList(vax_name:string, days_coverage_expired:Array<number>, res:any){
+    try{
+        if(vax_name !== null){
+            vax_name = vax_name.toLowerCase();
+        }
 
+        const coverage_expired_users = await sequelize.query(
+            `SELECT vaxs.user_key, vax.vaccine_name, max(vaxs.timestamp_vc) AS last_vaccination_timestamp, 
+            CURRENT_DATE - (vax.coverage + DATE(max(vaxs.timestamp_vc))) AS days_coverage_expired
+            FROM vaccine AS vax JOIN vaccination AS vaxs ON (vaxs.vaccine = vax.vaccine_id)
+            GROUP BY vax.vaccine_name, vaxs.user_key, vax.coverage
+            HAVING  vax.coverage + DATE(max(vaxs.timestamp_vc)) < CURRENT_DATE`,
+            {
+            type: QueryTypes.SELECT
+            }
+        )
+
+        const coverage_expired_users_json = JSON.parse(JSON.stringify(coverage_expired_users));
+        let listFiltered;
+        
+        if(vax_name === null && days_coverage_expired === null){
+            const new_res_msg = getSuccessMsg(SuccessMsgEnum.CoverageExpiredUserList).getMsg();
+            res.status(new_res_msg.status).json({Message:new_res_msg.msg, CoverageExpiredUserList:coverage_expired_users_json});
+        }else if(vax_name !== null && days_coverage_expired === null){
+            listFiltered = coverage_expired_users_json.filter((user: { vaccine_name: string; })  => user.vaccine_name === vax_name);
+            const new_res_msg = getSuccessMsg(SuccessMsgEnum.CoverageExpiredUserList).getMsg();
+            res.status(new_res_msg.status).json({Message:new_res_msg.msg, CoverageExpiredUserList:listFiltered});
+        }else if(vax_name === null && days_coverage_expired !== null){
+            if(days_coverage_expired[0] !== null && days_coverage_expired[1] === null){ // filter >
+                listFiltered = coverage_expired_users_json.filter((user: { days_coverage_expired: number; }) => 
+                user.days_coverage_expired > days_coverage_expired[0]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.CoverageExpiredUserList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, CoverageExpiredUserList:listFiltered});   
+            }else if(days_coverage_expired[0] === null && days_coverage_expired[1] !== null){ // filter <
+                listFiltered = coverage_expired_users_json.filter((user: { days_coverage_expired: number; }) => 
+                user.days_coverage_expired < days_coverage_expired[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.CoverageExpiredUserList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, CoverageExpiredUserList:listFiltered});   
+            }else if(days_coverage_expired[0] !== null && days_coverage_expired[1] !== null){ // filter >= <=
+                listFiltered = coverage_expired_users_json.filter((user: { days_coverage_expired: number; }) => 
+                user.days_coverage_expired >= days_coverage_expired[0] && user.days_coverage_expired <= days_coverage_expired[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.CoverageExpiredUserList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, CoverageExpiredUserList:listFiltered});
+            }
+        }else if(vax_name !== null && days_coverage_expired !== null){ // filters with both conditions
+            if(days_coverage_expired[0] !== null && days_coverage_expired[1] === null){ // filter >
+                listFiltered = coverage_expired_users_json.filter((user: { days_coverage_expired: number; vaccine_name:string; }) => 
+                user.days_coverage_expired > days_coverage_expired[0] && user.vaccine_name === vax_name);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.CoverageExpiredUserList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, CoverageExpiredUserList:listFiltered});   
+            }else if(days_coverage_expired[0] === null && days_coverage_expired[1] !== null){ // filter <
+                listFiltered = coverage_expired_users_json.filter((user: { days_coverage_expired: number; vaccine_name:string; })  => 
+                user.days_coverage_expired < days_coverage_expired[1] && user.vaccine_name === vax_name);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.CoverageExpiredUserList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, CoverageExpiredUserList:listFiltered});  
+            }else if(days_coverage_expired[0] !== null && days_coverage_expired[1] !== null){ // filter >= <=
+                listFiltered = coverage_expired_users_json.filter((user: { days_coverage_expired: number; vaccine_name:string; })  => 
+                user.days_coverage_expired >= days_coverage_expired[0] && user.days_coverage_expired <= days_coverage_expired[1] && user.vaccine_name === vax_name);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.CoverageExpiredUserList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, CoverageExpiredUserList:listFiltered});
+            }
+        }
+    }catch(error:any){
+        controllerErrors(ErrorMsgEnum.InternalServer, error, res);
+    }
+}

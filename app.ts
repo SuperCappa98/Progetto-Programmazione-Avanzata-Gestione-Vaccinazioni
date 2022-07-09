@@ -70,6 +70,14 @@ app.get('/vaccinationsJson', CoR.checkTokenField, CoR.checkFilterValue, (req:any
     // res.send("ok, you can pass to controller to get json")
 });
 
+// Route to display list of people with expired coverage that can be filtered by vaccine name and/or number of days since coverage expired
+app.get('/coverageExpiredUserList', CoR.checkAdmin, CoR.checkCoverageExpiredUserList, (req:any,res:any) => {
+    //res.send("ok, you can pass to controller");
+    if(!Object.keys(req.body).includes('vax_name')) req.body.vax_name = null;
+    if(!Object.keys(req.body).includes('days_coverage_expired')) req.body.days_coverage_expired = null;
+    controller.coverageExpiredUserList(req.body.vax_name, req.body.days_coverage_expired, res);
+});
+
 
 
 /*

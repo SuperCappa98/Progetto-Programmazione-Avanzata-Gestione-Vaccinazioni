@@ -416,5 +416,38 @@ export const checkFilterVaxNameJson = async (req: any, res: any, next: any) => {
     }
 };
 
+export const checkFilterNDaysCoverageExpired = (req: any, res: any, next: any) => {
+    if(req.body.days_coverage_expired == null) {
+        next();
+    }else if(Array.isArray(req.body.days_coverage_expired)) {
+        if(req.body.days_coverage_expired.length === 2){
+            var number_bool = true;
+            req.body.days_coverage_expired.forEach((number:any) => {
+                if(typeof number !== "number" && number !== null){
+                    number_bool = false;
+                }
+            });
+            if(number_bool) {
+                if(((req.body.days_coverage_expired[0] === null && req.body.days_coverage_expired[1]>=0) ||
+                    (req.body.days_coverage_expired[0]>=0 && req.body.days_coverage_expired[1] === null) ||
+                    (req.body.days_coverage_expired[0]>=0 && req.body.days_coverage_expired[1]>=0 
+                        && req.body.days_coverage_expired[1]>req.body.days_coverage_expired[0])) 
+                        && !(req.body.days_coverage_expired[0] === null && req.body.days_coverage_expired[1] === null)){
+                    next();
+                }else{
+                    next(ErrorMsgEnum.NotValidValue);
+                }
+            }else{
+                next(ErrorMsgEnum.NotValidValue);
+            }
+        }else{
+            next(ErrorMsgEnum.InvalidArrayLength);
+        }
+    }else{
+        next(ErrorMsgEnum.NotValidValue);
+    }
+};
+
+
 
 

@@ -63,7 +63,6 @@ export const checkVaccinationData = [
     errorHandler.errorHandler
 ]
 
-
 export const checkTokenField = [
     vaxMiddleware.checkTokenField,
     errorHandler.errorHandler
@@ -72,5 +71,11 @@ export const checkTokenField = [
 export const checkFilterValue = [
     vaxMiddleware.checkFilterVaxNameJson,
     vaxMiddleware.checkVaccinationDate,
+    errorHandler.errorHandler
+]
+
+export const checkCoverageExpiredUserList = [
+    vaxMiddleware.checkFilterVaxNameJson,
+    vaxMiddleware.checkFilterNDaysCoverageExpired,
     errorHandler.errorHandler
 ]
