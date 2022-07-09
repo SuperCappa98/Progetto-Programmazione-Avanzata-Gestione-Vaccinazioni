@@ -83,6 +83,15 @@ class NewVaccinationSuccessMsg implements Msg{
     }
 }
 
+class VaccinationsListSuccessMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.SuccessOK,
+            msg: "Success OK - Vaccinations list is successfully displayed"
+        }
+    }
+}
+
 export enum SuccessMsgEnum {
     AppStarted,
     NewVax,
@@ -92,7 +101,8 @@ export enum SuccessMsgEnum {
     NotAvailableDoses,
     FilterAvailableDoses,
     FilterNotAvailableDoses,
-    NewVaccination
+    NewVaccination,
+    VaccinationsList
 }
 
 export function getSuccessMsg(type: SuccessMsgEnum): Msg{
@@ -124,6 +134,9 @@ export function getSuccessMsg(type: SuccessMsgEnum): Msg{
             break;
         case SuccessMsgEnum.NewVaccination:
             msgval = new NewVaccinationSuccessMsg();
+            break;
+        case SuccessMsgEnum.VaccinationsList:
+            msgval = new VaccinationsListSuccessMsg();
             break;
     }
     return msgval;

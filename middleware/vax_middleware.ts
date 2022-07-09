@@ -360,3 +360,61 @@ export const checkTokenField = (req: any, res: any, next: any) => {
     }
 }
 
+// check values of vaccination date 
+export const checkVaccinationDate = (req: any, res: any, next: any) => {
+    if(req.body.vaccination_date == null) {
+        next();
+    }else if(Array.isArray(req.body.vaccination_date)) {
+        if(req.body.vaccination_date.length === 2){
+            // if [null,null] -> invalid
+            if(req.body.vaccination_date[0] === null && isNaN(req.body.vaccination_date[1])){ // [null, "date2"] -> find vaccinations before date2 
+                const vaccination_date = new Date(req.body.vaccination_date[1]);
+                if(vaccination_date.getDate()){                    
+                    next();
+                }else{
+                    next(ErrorMsgEnum.NotValidValue);
+                }
+            }else if(isNaN(req.body.vaccination_date[0]) && req.body.vaccination_date[1] === null){ // ["date1", null] -> find vaccinations after date1
+                const vaccination_date = new Date(req.body.vaccination_date[0]);
+                if(vaccination_date.getDate()){                    
+                    next();
+                }else{
+                    next(ErrorMsgEnum.NotValidValue);
+                }
+            }else if(isNaN(req.body.vaccination_date[0]) && isNaN(req.body.vaccination_date[1])){  // ["date1", "date2"] -> find vaccinations between date1 & date2
+                const min_vaccination_date = new Date(req.body.vaccination_date[0]);
+                const max_vaccination_date = new Date(req.body.vaccination_date[1]);
+                if(min_vaccination_date.getDate() && max_vaccination_date.getDate() && max_vaccination_date.getTime()>min_vaccination_date.getTime()){                    
+                    next();
+                }else{
+                    next(ErrorMsgEnum.NotValidValue);
+                }
+            }else{
+                next(ErrorMsgEnum.NotValidValue);
+            }
+        }else{
+            next(ErrorMsgEnum.InvalidArrayLength);
+        }
+    }else{
+        next(ErrorMsgEnum.NotValidValue);
+    }
+};
+
+export const checkFilterVaxNameJson = async (req: any, res: any, next: any) => {
+    if(req.body.vax_name == null) {
+        next();
+    }else if(typeof req.body.vax_name === "string") {
+        const vax_name = req.body.vax_name.toLowerCase();
+        const vaxName = await Vaccine.findOne({ where: {vaccine_name: vax_name}});
+        if(vaxName !== null){
+            next();
+        }else{
+            next(ErrorMsgEnum.NotFoundInDB);
+        }
+    }else{
+        next(ErrorMsgEnum.NotValidValue);
+    }
+};
+
+
+

@@ -55,13 +55,19 @@ app.get('/availableVaxDoses', CoR.checkAdmin, CoR.checkAvailableVaxDoses, (req:a
 // Route to add a vaccination
 app.post('/addVaccination', CoR.checkAdmin, CoR.checkVaccinationData, (req:any,res:any) => {
     controller.addVaccination(req.body.vaccine_id, req.body.batch, req.body.user_key, req.body.timestamp_vc, res);
-    //es.send("ok, you can add vaccination")
 });
 
 // Route to download user vaccinations in PDF
 app.get('/downloadPDF', CoR.checkTokenField, (req:any,res:any) => {
     controller.downloadPDF(req.user, res);
-    //res.send("ok, you can pass to controller")
+});
+
+// Route to get user vaccinations in JSON
+app.get('/vaccinationsJson', CoR.checkTokenField, CoR.checkFilterValue, (req:any,res:any) => {
+    if(!Object.keys(req.body).includes('vax_name')) req.body.vax_name = null;
+    if(!Object.keys(req.body).includes('vaccination_date')) req.body.vaccination_date = null;
+    controller.vaccinationsJson(req.user, req.body.vax_name, req.body.vaccination_date, res);
+    // res.send("ok, you can pass to controller to get json")
 });
 
 

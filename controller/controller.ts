@@ -575,7 +575,10 @@ export async function downloadPDF(req_user: any, res:any){
         user_key = user_key.toUpperCase();
 
         const vaccinations = await sequelize.query(
-            'SELECT vax.vaccine_name, vax.coverage, vaxs.batch, vaxs.user_key, vaxs.timestamp_vc FROM vaccine as vax JOIN vaccination as vaxs ON (vax.vaccine_id = vaxs.vaccine) WHERE user_key = :key ORDER BY timestamp_vc DESC',
+            `SELECT vax.vaccine_name, vax.coverage, vaxs.batch, vaxs.user_key, vaxs.timestamp_vc
+            FROM vaccine as vax JOIN vaccination as vaxs ON (vax.vaccine_id = vaxs.vaccine)
+            WHERE user_key = :key
+            ORDER BY timestamp_vc DESC`,
             {
             replacements: { key: user_key },
             type: QueryTypes.SELECT
@@ -613,6 +616,93 @@ export async function downloadPDF(req_user: any, res:any){
         generateInvoiceTable(doc, vaccinations_json);
         doc.end(); 
 
+    }catch(error:any){
+        controllerErrors(ErrorMsgEnum.InternalServer, error, res);
+    }
+}
+
+// get JSON with all the vaccinations for a user
+export async function vaccinationsJson(req_user: any, vax_name:string, vaccination_date:Array<Date>, res:any){
+    try{
+        var user_key;
+        if(vax_name !== null){
+            vax_name = vax_name.toLowerCase();
+        }
+        if(req_user.role === "Admin"){
+            user_key = req_user.userKeyClient; // admin need to get the client key
+        } else {
+            user_key = req_user.userKey; // client have already his personal key in token
+        }
+        user_key = user_key.toUpperCase();
+
+        // get the list for all the vaccinations
+        const vaccinations = await sequelize.query(
+            `SELECT vax.vaccine_name, vax.coverage, vaxs.batch, vaxs.user_key, vaxs.timestamp_vc
+            FROM vaccine as vax JOIN vaccination as vaxs ON (vax.vaccine_id = vaxs.vaccine)
+            WHERE user_key = :key
+            ORDER BY timestamp_vc DESC`,
+            {
+            replacements: { key: user_key },
+            type: QueryTypes.SELECT
+            }
+        )
+
+        console.log("all vaccinations: ",vaccinations);
+        const vaccinations_json = JSON.parse(JSON.stringify(vaccinations));
+        console.log("all vaccinations PARSED: ",vaccinations_json);
+
+
+        if(vax_name === null && vaccination_date === null){
+            const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
+            res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:vaccinations_json});
+            
+        }else if(vax_name !== null && vaccination_date === null){
+            const listFilteredName = vaccinations_json.filter((vaccination: { vaccine_name: string; })  => vaccination.vaccine_name === vax_name);
+            const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
+            res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFilteredName});
+
+        }else if(vax_name === null && vaccination_date !== null){
+            let listFilteredDate;
+            
+            if(vaccination_date[0] !== null && vaccination_date[1] === null){ // filter >
+                listFilteredDate = vaccinations_json.filter((vaccination: { timestamp_vc: Date; }) => 
+                vaccination.timestamp_vc > vaccination_date[0]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFilteredDate});     
+
+            }else if(vaccination_date[0] === null && vaccination_date[1] !== null){ // filter <
+                listFilteredDate = vaccinations_json.filter((vaccination: { timestamp_vc: Date; })  => 
+                vaccination.timestamp_vc < vaccination_date[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFilteredDate});    
+
+            }else if(vaccination_date[0] !== null && vaccination_date[1] !== null){ // filter < <
+                listFilteredDate = vaccinations_json.filter((vaccination: { timestamp_vc: Date; })  => 
+                vaccination.timestamp_vc >= vaccination_date[0] && vaccination.timestamp_vc <= vaccination_date[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFilteredDate});
+            }
+        }else if(vax_name !== null && vaccination_date !== null){ // filters with both conditions
+            let listFiltered;
+            if(vaccination_date[0] !== null && vaccination_date[1] === null){ // filter >
+                listFiltered = vaccinations_json.filter((vaccination: { timestamp_vc: Date; vaccine_name:string})  => 
+                vaccination.timestamp_vc > vaccination_date[0] && vaccination.vaccine_name === vax_name);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFiltered});    
+
+            }else if(vaccination_date[0] === null && vaccination_date[1] !== null){ // filter <
+                listFiltered = vaccinations_json.filter((vaccination: { timestamp_vc: Date; vaccine_name:string})  => 
+                vaccination.timestamp_vc < vaccination_date[1] && vaccination.vaccine_name === vax_name);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFiltered});    
+
+            }else if(vaccination_date[0] !== null && vaccination_date[1] !== null){ // filter < <
+                listFiltered = vaccinations_json.filter((vaccination: { timestamp_vc: Date; vaccine_name:string})  => 
+                vaccination.timestamp_vc >= vaccination_date[0] && vaccination.timestamp_vc <= vaccination_date[1] && vaccination.vaccine_name === vax_name);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFiltered});
+            }
+        }
     }catch(error:any){
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
     }
