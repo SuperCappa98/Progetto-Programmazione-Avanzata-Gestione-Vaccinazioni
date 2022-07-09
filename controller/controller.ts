@@ -777,3 +777,11 @@ export async function coverageExpiredUserList(vax_name:string, days_coverage_exp
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
     }
 }
+
+export async function coverageDataUser(format:string, order_by:string, res:any){
+    try{
+        
+    }catch(error:any){
+        controllerErrors(ErrorMsgEnum.InternalServer, error, res);
+    }
+}

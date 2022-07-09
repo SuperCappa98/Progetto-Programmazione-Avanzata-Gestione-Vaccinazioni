@@ -67,25 +67,23 @@ app.get('/vaccinationsJson', CoR.checkTokenField, CoR.checkFilterValue, (req:any
     if(!Object.keys(req.body).includes('vax_name')) req.body.vax_name = null;
     if(!Object.keys(req.body).includes('vaccination_date')) req.body.vaccination_date = null;
     controller.vaccinationsJson(req.user, req.body.vax_name, req.body.vaccination_date, res);
-    // res.send("ok, you can pass to controller to get json")
 });
 
 // Route to display list of people with expired coverage that can be filtered by vaccine name and/or number of days since coverage expired
-app.get('/coverageExpiredUserList', CoR.checkAdmin, CoR.checkCoverageExpiredUserList, (req:any,res:any) => {
-    //res.send("ok, you can pass to controller");
+app.get('/coverageExpiredUserList', CoR.checkAdmin, CoR.checkCoverageExpiredUserListFilters, (req:any,res:any) => {
     if(!Object.keys(req.body).includes('vax_name')) req.body.vax_name = null;
     if(!Object.keys(req.body).includes('days_coverage_expired')) req.body.days_coverage_expired = null;
     controller.coverageExpiredUserList(req.body.vax_name, req.body.days_coverage_expired, res);
 });
 
+// Route to 
+app.get('/coverageDataUser', CoR.checkTokenField, CoR.checkCoverageDataUserFilters, (req:any,res:any) => {
+    //res.send("ok, you can pass to controller");
+    if(!Object.keys(req.body).includes('order_by')) req.body.order_by = null;
+    controller.coverageDataUser(req.body.format, req.body.order_by, res);
+});
 
 
-/*
- *  routes
- */
-
-
- 
 // Server Setup
 app.listen(PORT, HOST);
 console.log(`Server started on port ${PORT}`);

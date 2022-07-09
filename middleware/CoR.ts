@@ -74,8 +74,14 @@ export const checkFilterValue = [
     errorHandler.errorHandler
 ]
 
-export const checkCoverageExpiredUserList = [
+export const checkCoverageExpiredUserListFilters = [
     vaxMiddleware.checkFilterVaxNameJson,
     vaxMiddleware.checkFilterNDaysCoverageExpired,
+    errorHandler.errorHandler
+]
+
+export const checkCoverageDataUserFilters = [
+    vaxMiddleware.checkFormat,
+    vaxMiddleware.checkOrderByFilter,
     errorHandler.errorHandler
 ]

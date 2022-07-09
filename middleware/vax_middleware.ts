@@ -8,8 +8,6 @@ import { User } from "../models/User";
 const Sequelize = require('sequelize');
 
 
-
-
 // Check vax data types and check no other vaccine in db with the same name
 export const checkVaxData = async (req: any, res: any, next: any) => {
     
@@ -315,7 +313,6 @@ export const checkBatchNotExpired = async (req: any, res: any, next: any) => {
     }     
 };
 
-
 // check if user still covered by req.vaccine
 export const checkUserNotCovered = async (req: any, res: any, next: any) => {
     const batch = req.body.batch.toUpperCase();
@@ -344,7 +341,6 @@ export const checkUserNotCovered = async (req: any, res: any, next: any) => {
     })
 }
 
-
 export const checkTokenField = (req: any, res: any, next: any) => {
     console.log(req.user);
     console.log(req.user.userKeyClient);
@@ -352,8 +348,7 @@ export const checkTokenField = (req: any, res: any, next: any) => {
         if(typeof(req.user.userKeyClient) === "string" && req.user.userKeyClient.length === 16){
             next();
         }else{
-            let error = new Error("Invalid client user key");
-            res.send(error.message);
+            next(ErrorMsgEnum.BadFormattedUserDataInJWTPayload);
         }
     } else {
         next(); // role = User -> no other fields to check
@@ -448,6 +443,23 @@ export const checkFilterNDaysCoverageExpired = (req: any, res: any, next: any) =
     }
 };
 
+export const checkFormat = (req: any, res: any, next: any) => {
+    if(req.body.format == "JSON" || req.body.format == "PDF") {
+        next();
+    }else{
+        next(ErrorMsgEnum.NotValidValue);
+    }
+};
+
+export const checkOrderByFilter = (req: any, res: any, next: any) => {
+    if(req.body.order_by == null) {
+        next();
+    }else if(req.body.order_by == "ASC" || req.body.order_by == "DESC") {
+        next();
+    }else{
+        next(ErrorMsgEnum.NotValidValue);
+    }
+};
 
 
 
