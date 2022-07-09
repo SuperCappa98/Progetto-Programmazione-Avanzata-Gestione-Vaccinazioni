@@ -863,6 +863,55 @@ export async function statistics(res:any){
             statistics_list.push(singleVax);
         }
         console.log(statistics_list);
+
+
+
+        //------ statistics for user not covered
+
+        const coverage_expired_users = await sequelize.query(
+            `SELECT vaxs.user_key, vax.vaccine_name, max(vaxs.timestamp_vc) AS last_vaccination_timestamp, 
+            CURRENT_DATE - (vax.coverage + DATE(max(vaxs.timestamp_vc))) AS days_coverage_expired
+            FROM vaccine AS vax JOIN vaccination AS vaxs ON (vaxs.vaccine = vax.vaccine_id)
+            GROUP BY vax.vaccine_name, vaxs.user_key, vax.coverage
+            HAVING  vax.coverage + DATE(max(vaxs.timestamp_vc)) < CURRENT_DATE`,
+            {
+            type: QueryTypes.SELECT
+            }
+        )
+
+        const coverage_expired_users_json = JSON.parse(JSON.stringify(coverage_expired_users));
+      
+        // filter user not covered > 90 days
+        let listFiltered_90 = coverage_expired_users_json.filter((user: { days_coverage_expired: number; }) => 
+        user.days_coverage_expired > 90);
+        console.log("listFiltered_90:",listFiltered_90);
+               
+        // filter user not covered <= 30 days
+        let listFiltered_30 = coverage_expired_users_json.filter((user: { days_coverage_expired: number; }) => 
+        user.days_coverage_expired <= 30);
+        console.log("listFiltered_30:",listFiltered_30);
+     
+        // filter user not covered   30  <  <= 90 days
+        let listFiltered_31_90 = coverage_expired_users_json.filter((user: { days_coverage_expired: number; }) => 
+        user.days_coverage_expired > 30 && user.days_coverage_expired <= 90);
+        console.log("listFiltered_31_90:",listFiltered_31_90);
+        
+        const users_90 = listFiltered_90.length;
+        const users_30 = listFiltered_30.length;
+        const users_31_90 = listFiltered_31_90.length;
+        console.log(users_90, users_30, users_31_90);
+
+        const users_statistics = {
+            "users not covered for more than 90 days": users_90,
+            "users not covered for less than 31 days": users_30,
+            "users not covered between 31 and 90 days": users_31_90,
+        }
+
+        statistics_list.push(users_statistics);
+
+        //-------------------------------------   
+
+
         const new_res_msg = getSuccessMsg(SuccessMsgEnum.Statistics).getMsg();
         res.status(new_res_msg.status).json({Message:new_res_msg.msg, Statistics:statistics_list});
         // res.send("here you are your statistcs with month aggregation!")
