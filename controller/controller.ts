@@ -10,6 +10,8 @@ import { Vaccination } from '../models/Vaccination';
 import { generateCustomerInformation, generateHeader, generateInvoiceTable } from '../utils/generate_pdf';
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+import { SingleVax } from '../utils/statistics';
+const math = require('mathjs');
 
 const sequelize: Sequelize = DBSingleton.getConnection();
 
@@ -785,3 +787,91 @@ export async function coverageDataUser(format:string, order_by:string, res:any){
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
     }
 }
+
+
+// get statistics
+export async function statistics(res:any){
+    try{
+
+        // list of vaccines in db
+        const vaxs = await Vaccine.findAll({attributes:["vaccine_id"]});
+        console.log("vaxs:",vaxs);
+        const parsed_vaxs = JSON.parse(JSON.stringify(vaxs));
+        console.log("parsed_vaxs:",parsed_vaxs);
+        const vaxs_list = parsed_vaxs.map((vaccine: { vaccine_id: any; }) => vaccine.vaccine_id);
+        console.log("vaxs_list:",vaxs_list);
+        let statistics_list = [];
+
+        // get statistics for each vaccin in db
+        for (let index = 0; index < vaxs_list.length; index++) {
+            console.log(`vaxs_list[${index}]:`, vaxs_list[index]);
+            const vaccinations = await Vaccination.findAll({attributes:["timestamp_vc"], where: { vaccine:vaxs_list[index]}}) // select vaccinations for specific vaccine
+            console.log(`vaxs_list[${index}]:`, vaxs_list[index]);
+            console.log(vaccinations);
+            const parsed_vaccinations = JSON.parse(JSON.stringify(vaccinations));
+            console.log(parsed_vaccinations);
+            const months = parsed_vaccinations.map((vaccination: { timestamp_vc:string; }) => {
+            const timestamp = new Date(vaccination.timestamp_vc);
+            return timestamp.getMonth()+1})
+            console.log(months); // [4, 12, 12]
+            const aggregate_months = months.reduce((acc:any, month:number) => {
+                (acc[month] = acc[month] + 1 || 1);
+                return acc;
+            }, {});
+            console.log(aggregate_months); // { '4': 1, '12': 2 }
+            let m:number;
+            for(m=1; m<=12; m++){
+                if(Number(aggregate_months[m])){
+                    console.log(`m in months: ${m}`);
+                    
+                } else {
+                    console.log(`m not in months: ${m}`);
+                    aggregate_months[m]= 0;
+                }
+            }
+            console.log(aggregate_months);  // { '1': 0, '2': 0 ... '4': 1,'5': 0,.... '12': 2 }
+
+            
+            const list_aggr_months = Object.values(aggregate_months) // [0,0 ... 1,0,.... 2 ]
+            console.log("list_aggr_months: ", list_aggr_months);
+            
+            const min = list_aggr_months.reduce((prev:any, current:any) => Math.min(prev,current));
+            const max = list_aggr_months.reduce((prev:any, current:any) => Math.max(prev, current));
+            
+            const sum_v = (list_aggr_months.reduce((prev:any, current:any) => prev + current, 0));
+            const sum_v_number = sum_v as number;
+            const mean_vaccinations = sum_v_number / list_aggr_months.length;
+            const dev =  math.std(list_aggr_months, 'biased');
+           
+
+            console.log("min: ", min);
+            console.log("max: ", max);
+            console.log("vaccinations_mean: ", mean_vaccinations);
+            console.log("dev: ", dev);
+
+            const delivery = await Delivery.findAll({attributes:["delivery_doses"], where: { vaccine:vaxs_list[index]}});
+            const parsed_delivery = JSON.parse(JSON.stringify(delivery));
+            console.log("parsed_delivery: ", parsed_delivery);
+            const total_delivery = parsed_delivery.reduce((acc:any, delivery:any) => acc + delivery.delivery_doses, 0);
+            console.log("total_delivery: ", total_delivery);
+            const total_deliv_number = total_delivery as number;
+            const mean_delivery = total_deliv_number / list_aggr_months.length;
+
+            let vaccine = await Vaccine.findOne({attributes:["vaccine_name"], where: {vaccine_id:vaxs_list[index] }});
+            let parsed_vaccine = JSON.parse(JSON.stringify(vaccine));
+            const singleVax = new SingleVax(parsed_vaccine['vaccine_name'], min, max, +mean_vaccinations.toFixed(2), +dev.toFixed(2), +mean_delivery.toFixed(2) );
+            statistics_list.push(singleVax);
+        }
+        console.log(statistics_list);
+        const new_res_msg = getSuccessMsg(SuccessMsgEnum.Statistics).getMsg();
+        res.status(new_res_msg.status).json({Message:new_res_msg.msg, Statistics:statistics_list});
+        // res.send("here you are your statistcs with month aggregation!")
+
+
+    }catch(error:any){
+        controllerErrors(ErrorMsgEnum.InternalServer, error, res);
+    }
+}
+
+
+

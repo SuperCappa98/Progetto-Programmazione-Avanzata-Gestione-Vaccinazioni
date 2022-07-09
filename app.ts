@@ -83,6 +83,11 @@ app.get('/coverageDataUser', CoR.checkTokenField, CoR.checkCoverageDataUserFilte
     controller.coverageDataUser(req.body.format, req.body.order_by, res);
 });
 
+// Route to get statistics 
+app.get('/statistics', CoR.checkAdmin, (req:any,res:any) => {
+    controller.statistics(res);
+});
+
 
 // Server Setup
 app.listen(PORT, HOST);

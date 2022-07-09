@@ -101,6 +101,15 @@ class CoverageExpiredUserListSuccessMsg implements Msg{
     }
 }
 
+class StatisticsSuccessMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.SuccessOK,
+            msg: "Success OK - Statistics are successfully displayed"
+        }
+    }
+}
+
 export enum SuccessMsgEnum {
     AppStarted,
     NewVax,
@@ -112,7 +121,8 @@ export enum SuccessMsgEnum {
     FilterNotAvailableDoses,
     NewVaccination,
     VaccinationsList,
-    CoverageExpiredUserList
+    CoverageExpiredUserList,
+    Statistics
 }
 
 export function getSuccessMsg(type: SuccessMsgEnum): Msg{
@@ -150,6 +160,9 @@ export function getSuccessMsg(type: SuccessMsgEnum): Msg{
             break;
         case SuccessMsgEnum.CoverageExpiredUserList:
             msgval = new CoverageExpiredUserListSuccessMsg();
+            break;
+        case SuccessMsgEnum.Statistics:
+            msgval = new StatisticsSuccessMsg();
             break;
     }
     return msgval;

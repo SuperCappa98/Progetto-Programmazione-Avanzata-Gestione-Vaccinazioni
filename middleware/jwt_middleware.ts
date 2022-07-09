@@ -56,7 +56,10 @@ export const checkToken = (req: any, res: any, next: any) => {
 export const checkJwtPayload = (req: any, res: any, next: any) => {
     
     console.log(req.user);
-    if((req.user.role === "Admin" || req.user.role === "User") && (typeof req.user.name === "string") && (typeof req.user.surname === "string") && (req.user.userKey.length === 16) ){
+    if((req.user.role === "Admin" || req.user.role === "User") 
+        && (typeof req.user.name === "string") 
+        && (typeof req.user.surname === "string") 
+        && (req.user.userKey.length === 16) ){
         next();
     }else{
         next(ErrorMsgEnum.BadFormattedUserDataInJWTPayload);
