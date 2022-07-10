@@ -146,6 +146,15 @@ class UserStillCoveredErrorMsg implements Msg{
     }
 }
 
+class RouteNotFoundErrorMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.ClientErrorNotFound,
+            msg: "Not found - Route not found"
+        }
+    }
+}
+
 
 export enum ErrorMsgEnum {
     MissingToken,
@@ -163,7 +172,8 @@ export enum ErrorMsgEnum {
     InvalidArrayLength,
     NoMoreDosesInBatch,
     DosesInBatchExpired,
-    UserStillCovered
+    UserStillCovered,
+    RouteNotFound
 }
 
 export function getErrorMsg(type: ErrorMsgEnum): Msg{
@@ -216,6 +226,9 @@ export function getErrorMsg(type: ErrorMsgEnum): Msg{
             break;
         case ErrorMsgEnum.UserStillCovered:
             msgval = new UserStillCoveredErrorMsg();
+            break;
+        case ErrorMsgEnum.RouteNotFound:
+            msgval = new RouteNotFoundErrorMsg();
             break;
 }
     return msgval;

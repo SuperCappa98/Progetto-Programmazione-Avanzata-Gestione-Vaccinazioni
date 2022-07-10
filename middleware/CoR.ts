@@ -85,3 +85,8 @@ export const checkCoverageDataUserFilters = [
     vaxMiddleware.checkOrderByFilter,
     errorHandler.errorHandler
 ]
+
+export const unexpectedRoute = [
+    vaxMiddleware.routeNotFound,
+    errorHandler.errorHandler
+]

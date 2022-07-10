@@ -461,5 +461,7 @@ export const checkOrderByFilter = (req: any, res: any, next: any) => {
     }
 };
 
-
+export const routeNotFound = (req: any, res: any, next: any) => {
+    next(ErrorMsgEnum.RouteNotFound);
+};
 

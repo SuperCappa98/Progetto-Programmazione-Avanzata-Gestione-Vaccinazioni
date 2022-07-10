@@ -46,7 +46,7 @@ app.get('/vaxList', CoR.checkAdmin, CoR.checkVaxFilters, (req:any,res:any) => {
     controller.vaxList(req.body.vax_name, req.body.availability, req.body.expiration_date, res);
 });
 
-// Route to display whether a given vaccine has any available doses and if so also allows filtering of availability
+// Route to display whether a given vaccine has any available doses and if so also allows filtering by availability
 app.get('/availableVaxDoses', CoR.checkAdmin, CoR.checkAvailableVaxDoses, (req:any,res:any) => {
     if(!Object.keys(req.body).includes('availability')) req.body.availability = null;
     controller.availableVaxDoses(req.body.vax_name, req.body.availability, res);
@@ -76,7 +76,7 @@ app.get('/coverageExpiredUserList', CoR.checkAdmin, CoR.checkCoverageExpiredUser
     controller.coverageExpiredUserList(req.body.vax_name, req.body.days_coverage_expired, res);
 });
 
-// Route to 
+// Route that depending on the format returns the required user coverage data in JSON or PDF that can be sorted ascending or descending by days coverage
 app.get('/coverageDataUser', CoR.checkTokenField, CoR.checkCoverageDataUserFilters, (req:any,res:any) => {
     //res.send("ok, you can pass to controller");
     if(!Object.keys(req.body).includes('order_by')) req.body.order_by = null;
@@ -88,6 +88,9 @@ app.get('/statistics', CoR.checkAdmin, (req:any,res:any) => {
     controller.statistics(res);
 });
 
+// Unexpected route management
+app.get('*', CoR.unexpectedRoute);
+app.post('*', CoR.unexpectedRoute);
 
 // Server Setup
 app.listen(PORT, HOST);
