@@ -1,7 +1,6 @@
 import {Vaccine} from '../models/Vaccine';
 import {ErrorMsgEnum, getErrorMsg} from "../factory/errorMsg";
 import {SuccessMsgEnum, getSuccessMsg} from "../factory/successMsg";
-import exp from 'constants';
 import { Batch } from '../models/Batch';
 import { Delivery } from '../models/Delivery';
 import { DBSingleton } from "../singleton/DBSingleton";
@@ -9,7 +8,6 @@ import { QueryTypes, Sequelize } from 'sequelize';
 import { Vaccination } from '../models/Vaccination';
 import { generateCustomerInformation, generateHeader, generateVaccinationTable, generateCoverageDataUserTable } from '../utils/generate_pdf';
 const PDFDocument = require('pdfkit');
-const fs = require('fs');
 import { SingleVax } from '../utils/statistics';
 const math = require('mathjs');
 
@@ -60,7 +58,6 @@ export async function addVaxDoses(delivery_doses:number, batch:string, delivery_
         // if batch already in db we update available doses
         if(batch_in_db !== null) {
             const updateDoses = await Batch.increment(["available_doses"], {by:delivery_doses, where:{vaccine:vaccine_id, batch:batch}});
-
         }else{ // if batch not in db we create batch 
             const newBatch = await Batch.create({batch:batch, vaccine:vaccine_id, available_doses:delivery_doses, expiration_date:expiration_date });
         }
@@ -68,7 +65,7 @@ export async function addVaxDoses(delivery_doses:number, batch:string, delivery_
         await Delivery.create({ delivery_doses: delivery_doses, batch: batch, delivery_date: delivery_date, vaccine: vaccine_id})
         .then((newDelivery:any) => {
             const new_res_msg = getSuccessMsg(SuccessMsgEnum.NewDeliveryWithNDoses).getMsg();   
-            var new_delivery = {Batch:newDelivery.batch, Doses:newDelivery.delivery_doses, DeliveryDate:newDelivery.delivery_date, VaccineId:newDelivery.vaccine}   
+            var new_delivery = {Batch:newDelivery.batch, Doses:newDelivery.delivery_doses, DeliveryDate:newDelivery.delivery_date, VaccineId:newDelivery.vaccine};   
             res.status(new_res_msg.status).json({Message:new_res_msg.msg, NewDelivery:new_delivery});
              
         });
@@ -79,390 +76,255 @@ export async function addVaxDoses(delivery_doses:number, batch:string, delivery_
 
 export async function vaxList(vax_name: Array<string>, availability: Array<number>, expiration_date: Array<Date>, res:any): Promise<void>{
     try{
+        var vaccine_name:string[] = [];
+        if(vax_name !== null){
+            for (let i = 0; i < vax_name.length; i++) {
+                vaccine_name[i]= vax_name[i].toLowerCase();
+            }
+        }
+
+        const vax_data = await sequelize.query(
+            `SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses 
+            FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id)  
+            GROUP BY v.vaccine_id, b.batch, b.expiration_date`,
+            {
+                type: QueryTypes.SELECT
+            }
+        );
+        
+        const vax_data_json = JSON.parse(JSON.stringify(vax_data));
+        console.log(vax_data_json);
+        let listFiltered;
+
         if (vax_name == null && availability == null && expiration_date == null){
             await Vaccine.findAll().then((vaxList: object[]) => {
                 const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
                 res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
             });
         }else if(availability == null && expiration_date == null) {
-            var vaccine_name:string[] = [];
-            for (let i = 0; i < vax_name.length; i++) {
-                vaccine_name[i]= vax_name[i].toLowerCase();
-            }
-            await Vaccine.findAll({
-                where: {vaccine_name:vaccine_name}
-            }).then((vaxList: object[]) => {
+            await Vaccine.findAll({ where: {vaccine_name:vaccine_name} }).then((vaxList: object[]) => {
                 const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
                 res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
             });
         }else if(vax_name == null && expiration_date == null) {
-            if(availability[0] !== null && availability[1] === null) {
-                await sequelize.query(
-                    'SELECT v.*, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) GROUP BY v.vaccine_id HAVING sum(b.available_doses) > ?',
-                    {
-                        replacements: [availability[0]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
-            }else if(availability[0] === null && availability[1] !== null) {
-                await sequelize.query(
-                    'SELECT v.*, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) GROUP BY v.vaccine_id HAVING sum(b.available_doses) < ?',
-                    {
-                        replacements: [availability[1]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
-            }else{
-                await sequelize.query(
-                    'SELECT v.*, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) GROUP BY v.vaccine_id HAVING sum(b.available_doses) >= ? AND sum(b.available_doses) <= ?',
-                    {
-                        replacements: [availability[0], availability[1]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
-            }
+            listFiltered = vax_data_json.map((vax_data: any) => {
+                let new_vax_data = Object.assign({}, vax_data);
+                delete new_vax_data.batch;
+                delete new_vax_data.expiration_date;
+                return new_vax_data;
+            }).reduce((c: { vaccine_id: any; vaccine_name: any; coverage: any; total_available_doses: any; }[], 
+                i: { vaccine_id: any; vaccine_name: any; coverage: any; total_available_doses: any; }) => {
+                let cc = c.findIndex((e)=>e.vaccine_id==i.vaccine_id);
+                if(cc==-1) c.push({vaccine_id: i.vaccine_id, vaccine_name:i.vaccine_name, coverage:i.coverage, total_available_doses: parseInt(i.total_available_doses)});
+                else c[cc].total_available_doses += parseInt(i.total_available_doses);
+                return c
+            }, []);
+            //console.log(listFiltered);
+
+            if(availability[0] !== null && availability[1] === null){ // filter >
+                listFiltered = listFiltered.filter((vax_data: { total_available_doses: number; }) => 
+                vax_data.total_available_doses > availability[0]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+            }else if(availability[0] === null && availability[1] !== null){ // filter <
+                listFiltered = listFiltered.filter((vax_data: { total_available_doses: number; }) => 
+                vax_data.total_available_doses < availability[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+            }else if(availability[0] !== null && availability[1] !== null){ // filter >= <=
+                listFiltered = listFiltered.filter((vax_data: { total_available_doses: number; }) => 
+                vax_data.total_available_doses >= availability[0] && vax_data.total_available_doses <= availability[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+            }        
         }else if(vax_name == null && availability == null) {
-            if(expiration_date[0] !== null && expiration_date[1] === null) {
-                await sequelize.query(
-                    'SELECT v.*, b.batch, b.expiration_date FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date > ?',
-                    {
-                        replacements: [expiration_date[0]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
-            }else if(expiration_date[0] === null && expiration_date[1] !== null) {
-                await sequelize.query(
-                    'SELECT v.*, b.batch, b.expiration_date FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date < ?',
-                    {
-                        replacements: [expiration_date[1]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
-            }else{
-                await sequelize.query(
-                    'SELECT v.*, b.batch, b.expiration_date FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date >= ? AND b.expiration_date <= ?',
-                    {
-                        replacements: [expiration_date[0], expiration_date[1]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
-            }
-        }else if(availability == null) {
-            var vaccine_name:string[] = [];
-            for (let i = 0; i < vax_name.length; i++) {
-                vaccine_name[i]= vax_name[i].toLowerCase();
-            }
-            if(expiration_date[0] !== null && expiration_date[1] === null) {
-                await sequelize.query(
-                    'SELECT v.*, b.batch, b.expiration_date FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date > ?',
-                    {
-                        replacements: [vaccine_name, expiration_date[0]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
-            }else if(expiration_date[0] === null && expiration_date[1] !== null) {
-                await sequelize.query(
-                    'SELECT v.*, b.batch, b.expiration_date FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date < ?',
-                    {
-                        replacements: [vaccine_name, expiration_date[1]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
-            }else{
-                await sequelize.query(
-                    'SELECT v.*, b.batch, b.expiration_date FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date >= ? AND b.expiration_date <= ?',
-                    {
-                        replacements: [vaccine_name, expiration_date[0], expiration_date[1]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
+            listFiltered = vax_data_json.map((vax_data: any) => {
+                let new_vax_data = Object.assign({}, vax_data);
+                delete new_vax_data.total_available_doses;
+                return new_vax_data;
+            });
+            //console.log(listFiltered);
+
+            if(expiration_date[0] !== null && expiration_date[1] === null){ // filter >
+                listFiltered = listFiltered.filter((vax_data: { expiration_date: Date; }) => 
+                vax_data.expiration_date > expiration_date[0]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});     
+            }else if(expiration_date[0] === null && expiration_date[1] !== null){ // filter <
+                listFiltered = listFiltered.filter((vax_data: { expiration_date: Date; })  => 
+                vax_data.expiration_date < expiration_date[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});    
+            }else if(expiration_date[0] !== null && expiration_date[1] !== null){ // filter >= <=
+                listFiltered = listFiltered.filter((vax_data: { expiration_date: Date; })  => 
+                vax_data.expiration_date >= expiration_date[0] && vax_data.expiration_date <= expiration_date[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
             }
         }else if(expiration_date == null) {
-            var vaccine_name:string[] = [];
-            for (let i = 0; i < vax_name.length; i++) {
-                vaccine_name[i]= vax_name[i].toLowerCase();
-            }
-            if(availability[0] !== null && availability[1] === null) {
-                await sequelize.query(
-                    'SELECT v.*, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) GROUP BY v.vaccine_id HAVING sum(b.available_doses) > ?',
-                    {
-                        replacements: [vaccine_name, availability[0]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
-            }else if(availability[0] === null && availability[1] !== null) {
-                await sequelize.query(
-                    'SELECT v.*, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) GROUP BY v.vaccine_id HAVING sum(b.available_doses) < ?',
-                    {
-                        replacements: [vaccine_name, availability[1]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
-            }else{
-                await sequelize.query(
-                    'SELECT v.*, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) GROUP BY v.vaccine_id HAVING sum(b.available_doses) >= ? AND sum(b.available_doses) <= ?',
-                    {
-                        replacements: [vaccine_name, availability[0], availability[1]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxList: object[]) => {
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                });
+            listFiltered = vax_data_json.map((vax_data: any) => {
+                let new_vax_data = Object.assign({}, vax_data);
+                delete new_vax_data.batch;
+                delete new_vax_data.expiration_date;
+                return new_vax_data;
+            }).reduce((c: { vaccine_id: any; vaccine_name: any; coverage: any; total_available_doses: any; }[], 
+                i: { vaccine_id: any; vaccine_name: any; coverage: any; total_available_doses: any; }) => {
+                let cc = c.findIndex((e)=>e.vaccine_id==i.vaccine_id);
+                if(cc==-1) c.push({vaccine_id: i.vaccine_id, vaccine_name:i.vaccine_name, coverage:i.coverage, total_available_doses: parseInt(i.total_available_doses)});
+                else c[cc].total_available_doses += parseInt(i.total_available_doses);
+                return c
+            }, []).filter((vax_data: { vaccine_name: string; })  => vaccine_name.includes(vax_data.vaccine_name));
+            //console.log(listFiltered);
+
+            if(availability[0] !== null && availability[1] === null){ // filter >
+                listFiltered = listFiltered.filter((vax_data: { total_available_doses: number; }) => 
+                vax_data.total_available_doses > availability[0]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+            }else if(availability[0] === null && availability[1] !== null){ // filter <
+                listFiltered = listFiltered.filter((vax_data: { total_available_doses: number; }) => 
+                vax_data.total_available_doses < availability[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+            }else if(availability[0] !== null && availability[1] !== null){ // filter >= <=
+                listFiltered = listFiltered.filter((vax_data: { total_available_doses: number; }) => 
+                vax_data.total_available_doses >= availability[0] && vax_data.total_available_doses <= availability[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+            }      
+        }else if(availability == null) {
+            listFiltered = vax_data_json.map((vax_data: any) => {
+                let new_vax_data = Object.assign({}, vax_data);
+                delete new_vax_data.total_available_doses;
+                return new_vax_data;
+            }).filter((vax_data: { vaccine_name: string; })  => vaccine_name.includes(vax_data.vaccine_name));
+            console.log(listFiltered);
+
+            if(expiration_date[0] !== null && expiration_date[1] === null){ // filter >
+                listFiltered = listFiltered.filter((vax_data: { expiration_date: Date; }) => 
+                vax_data.expiration_date > expiration_date[0]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});     
+            }else if(expiration_date[0] === null && expiration_date[1] !== null){ // filter <
+                listFiltered = listFiltered.filter((vax_data: { expiration_date: Date; })  => 
+                vax_data.expiration_date < expiration_date[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});    
+            }else if(expiration_date[0] !== null && expiration_date[1] !== null){ // filter >= <=
+                listFiltered = listFiltered.filter((vax_data: { expiration_date: Date; })  => 
+                vax_data.expiration_date >= expiration_date[0] && vax_data.expiration_date <= expiration_date[1]);
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
             }
         }else if(vax_name == null) {
-            if(expiration_date[0] !== null && expiration_date[1] === null) {
-                if(availability[0] !== null && availability[1] === null) {
-                    await sequelize.query(
-                        `SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses 
-                        FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date > ? 
-                        GROUP BY v.vaccine_id, b.batch, b.expiration_date 
-                        HAVING sum(b.available_doses) > ?`,
-                        {
-                            replacements: [expiration_date[0], availability[0]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else if(availability[0] === null && availability[1] !== null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date > ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) < ?',
-                        {
-                            replacements: [expiration_date[0], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else{
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date > ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) >= ? AND sum(b.available_doses) <= ?',
-                        {
-                            replacements: [expiration_date[0], availability[0], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }
-            }else if(expiration_date[0] === null && expiration_date[1] !== null) {
-                if(availability[0] !== null && availability[1] === null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date < ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) > ?',
-                        {
-                            replacements: [expiration_date[1], availability[0]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else if(availability[0] === null && availability[1] !== null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date < ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) < ?',
-                        {
-                            replacements: [expiration_date[1], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else{
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date < ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) >= ? AND sum(b.available_doses) <= ?',
-                        {
-                            replacements: [expiration_date[1], availability[0], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }
-            }else{
-                if(availability[0] !== null && availability[1] === null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date >= ? AND b.expiration_date <= ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) > ?',
-                        {
-                            replacements: [expiration_date[0], expiration_date[1], availability[0]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else if(availability[0] === null && availability[1] !== null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date >= ? AND b.expiration_date <= ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) < ?',
-                        {
-                            replacements: [expiration_date[0], expiration_date[1], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else{
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE b.expiration_date >= ? AND b.expiration_date <= ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) >= ? AND sum(b.available_doses) <= ?',
-                        {
-                            replacements: [expiration_date[0], expiration_date[1], availability[0], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }
+            if(expiration_date[0] !== null && expiration_date[1] === null){ // filter >
+                if(availability[0] !== null && availability[1] === null){ // filter >
+                    listFiltered = vax_data_json.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date > expiration_date[0] && vax_data.total_available_doses > availability[0]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] === null && availability[1] !== null){ // filter <
+                    listFiltered = vax_data_json.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date > expiration_date[0] && vax_data.total_available_doses < availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] !== null && availability[1] !== null){ // filter >= <=
+                    listFiltered = vax_data_json.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date > expiration_date[0] && vax_data.total_available_doses >= availability[0] && vax_data.total_available_doses <= availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }     
+            }else if(expiration_date[0] === null && expiration_date[1] !== null){ // filter <
+                if(availability[0] !== null && availability[1] === null){ // filter >
+                    listFiltered = vax_data_json.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date < expiration_date[1] && vax_data.total_available_doses > availability[0]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] === null && availability[1] !== null){ // filter <
+                    listFiltered = vax_data_json.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date < expiration_date[1] && vax_data.total_available_doses < availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] !== null && availability[1] !== null){ // filter >= <=
+                    listFiltered = vax_data_json.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date < expiration_date[1] && vax_data.total_available_doses >= availability[0] && vax_data.total_available_doses <= availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }     
+            }else if(expiration_date[0] !== null && expiration_date[1] !== null){ // filter >= <=
+                if(availability[0] !== null && availability[1] === null){ // filter >
+                    listFiltered = vax_data_json.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date >= expiration_date[0] && vax_data.expiration_date <= expiration_date[1] && vax_data.total_available_doses > availability[0]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] === null && availability[1] !== null){ // filter <
+                    listFiltered = vax_data_json.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date >= expiration_date[0] && vax_data.expiration_date <= expiration_date[1] && vax_data.total_available_doses < availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] !== null && availability[1] !== null){ // filter >= <=
+                    listFiltered = vax_data_json.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date >= expiration_date[0] && vax_data.expiration_date <= expiration_date[1] && 
+                    vax_data.total_available_doses >= availability[0] && vax_data.total_available_doses <= availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }     
             }
         }else{
-            var vaccine_name:string[] = [];
-            for (let i = 0; i < vax_name.length; i++) {
-                vaccine_name[i]= vax_name[i].toLowerCase();
-            }
-            if(expiration_date[0] !== null && expiration_date[1] === null) {
-                if(availability[0] !== null && availability[1] === null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date > ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) > ?',
-                        {
-                            replacements: [vaccine_name, expiration_date[0], availability[0]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else if(availability[0] === null && availability[1] !== null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date > ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) < ?',
-                        {
-                            replacements: [vaccine_name, expiration_date[0], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else{
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date > ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) >= ? AND sum(b.available_doses) <= ?',
-                        {
-                            replacements: [vaccine_name, expiration_date[0], availability[0], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }
-            }else if(expiration_date[0] === null && expiration_date[1] !== null) {
-                if(availability[0] !== null && availability[1] === null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date < ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) > ?',
-                        {
-                            replacements: [vaccine_name, expiration_date[1], availability[0]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else if(availability[0] === null && availability[1] !== null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date < ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) < ?',
-                        {
-                            replacements: [vaccine_name, expiration_date[1], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else{
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date < ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) >= ? AND sum(b.available_doses) <= ?',
-                        {
-                            replacements: [vaccine_name, expiration_date[1], availability[0], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }
-            }else{
-                if(availability[0] !== null && availability[1] === null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date >= ? AND b.expiration_date <= ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) > ?',
-                        {
-                            replacements: [vaccine_name, expiration_date[0], expiration_date[1], availability[0]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else if(availability[0] === null && availability[1] !== null) {
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date >= ? AND b.expiration_date <= ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) < ?',
-                        {
-                            replacements: [vaccine_name, expiration_date[0], expiration_date[1], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }else{
-                    await sequelize.query(
-                        'SELECT v.*, b.batch, b.expiration_date, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name IN (?) AND b.expiration_date >= ? AND b.expiration_date <= ? GROUP BY v.vaccine_id, b.batch, b.expiration_date HAVING sum(b.available_doses) >= ? AND sum(b.available_doses) <= ?',
-                        {
-                            replacements: [vaccine_name, expiration_date[0], expiration_date[1], availability[0], availability[1]],
-                            type: QueryTypes.SELECT
-                        }
-                    ).then((vaxList: object[]) => {
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:vaxList});
-                    });
-                }
+            listFiltered = vax_data_json.filter((vax_data: { vaccine_name: string; })  => vaccine_name.includes(vax_data.vaccine_name));
+
+            if(expiration_date[0] !== null && expiration_date[1] === null){ // filter >
+                if(availability[0] !== null && availability[1] === null){ // filter >
+                    listFiltered = listFiltered.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date > expiration_date[0] && vax_data.total_available_doses > availability[0]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] === null && availability[1] !== null){ // filter <
+                    listFiltered = listFiltered.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date > expiration_date[0] && vax_data.total_available_doses < availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] !== null && availability[1] !== null){ // filter >= <=
+                    listFiltered = listFiltered.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date > expiration_date[0] && vax_data.total_available_doses >= availability[0] && vax_data.total_available_doses <= availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }     
+            }else if(expiration_date[0] === null && expiration_date[1] !== null){ // filter <
+                if(availability[0] !== null && availability[1] === null){ // filter >
+                    listFiltered = listFiltered.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date < expiration_date[1] && vax_data.total_available_doses > availability[0]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] === null && availability[1] !== null){ // filter <
+                    listFiltered = listFiltered.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date < expiration_date[1] && vax_data.total_available_doses < availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] !== null && availability[1] !== null){ // filter >= <=
+                    listFiltered = listFiltered.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date < expiration_date[1] && vax_data.total_available_doses >= availability[0] && vax_data.total_available_doses <= availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }     
+            }else if(expiration_date[0] !== null && expiration_date[1] !== null){ // filter >= <=
+                if(availability[0] !== null && availability[1] === null){ // filter >
+                    listFiltered = listFiltered.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date >= expiration_date[0] && vax_data.expiration_date <= expiration_date[1] && vax_data.total_available_doses > availability[0]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] === null && availability[1] !== null){ // filter <
+                    listFiltered = listFiltered.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date >= expiration_date[0] && vax_data.expiration_date <= expiration_date[1] && vax_data.total_available_doses < availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }else if(availability[0] !== null && availability[1] !== null){ // filter >= <=
+                    listFiltered = listFiltered.filter((vax_data: {expiration_date:Date, total_available_doses: number; }) => 
+                    vax_data.expiration_date >= expiration_date[0] && vax_data.expiration_date <= expiration_date[1] && 
+                    vax_data.total_available_doses >= availability[0] && vax_data.total_available_doses <= availability[1]);
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaxList).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaxList:listFiltered});
+                }     
             }
         }
     }catch (error:any) {
@@ -473,76 +335,63 @@ export async function vaxList(vax_name: Array<string>, availability: Array<numbe
 export async function availableVaxDoses(vax_name: string, availability: Array<number>, res:any): Promise<void>{
     try{
         const vaccine_name= vax_name.toLowerCase();
+
+        const vax_data = await sequelize.query(
+            `SELECT v.*, sum(b.available_doses) as total_available_doses 
+            FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) 
+            WHERE v.vaccine_name = ? 
+            GROUP BY v.vaccine_id 
+            HAVING sum(b.available_doses) > 0`,
+            {
+                replacements: [vaccine_name],
+                type: QueryTypes.SELECT
+            }
+        );
+
+        const vax_data_json = JSON.parse(JSON.stringify(vax_data));
+        //console.log(vax_data_json);
+
         if(availability == null){
-            await sequelize.query(
-                'SELECT v.*, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name = ? GROUP BY v.vaccine_id HAVING sum(b.available_doses) > 0',
-                {
-                    replacements: [vaccine_name],
-                    type: QueryTypes.SELECT
-                }
-            ).then((vaxData: object[]) => {
-                if(vaxData.length !== 0) {
-                    let vax_data_json = JSON.parse(JSON.stringify(vaxData));
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.AvailableDoses).getMsg();
-                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, AvailableDoses:vax_data_json[0].total_available_doses});
+            if(vax_data_json.length !== 0) {
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.AvailableDoses).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg, AvailableDoses:vax_data_json[0].total_available_doses});
+            }else{
+                const new_res_msg = getSuccessMsg(SuccessMsgEnum.NotAvailableDoses).getMsg();
+                res.status(new_res_msg.status).json({Message:new_res_msg.msg});
+            }
+        }else{
+            let listFiltered;
+            if(availability[0] !== null && availability[1] === null){ // filter >
+                listFiltered = vax_data_json.filter((vax_data: { total_available_doses: number; }) => 
+                vax_data.total_available_doses > availability[0]);
+                if(listFiltered.length !== 0) {
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterAvailableDoses).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, AvailableDoses:listFiltered[0].total_available_doses});
                 }else{
-                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.NotAvailableDoses).getMsg();
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterNotAvailableDoses).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg});
+                }  
+            }else if(availability[0] === null && availability[1] !== null){ // filter <
+                listFiltered = vax_data_json.filter((vax_data: { total_available_doses: number; }) => 
+                vax_data.total_available_doses < availability[1]);
+                if(listFiltered.length !== 0) {
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterAvailableDoses).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, AvailableDoses:listFiltered[0].total_available_doses});
+                }else{
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterNotAvailableDoses).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg});
+                }   
+            }else if(availability[0] !== null && availability[1] !== null){ // filter >= <=
+                listFiltered = vax_data_json.filter((vax_data: { total_available_doses: number; }) => 
+                vax_data.total_available_doses >= availability[0] && vax_data.total_available_doses <= availability[1]);
+                if(listFiltered.length !== 0) {
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterAvailableDoses).getMsg();
+                    res.status(new_res_msg.status).json({Message:new_res_msg.msg, AvailableDoses:listFiltered[0].total_available_doses});
+                }else{
+                    const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterNotAvailableDoses).getMsg();
                     res.status(new_res_msg.status).json({Message:new_res_msg.msg});
                 }
-            });
-        }else{
-            if(availability[0] !== null && availability[1] === null) {
-                await sequelize.query(
-                    'SELECT v.*, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name = ? GROUP BY v.vaccine_id HAVING sum(b.available_doses) > ?',
-                    {
-                        replacements: [vaccine_name, availability[0]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxData: object[]) => {
-                    if(vaxData.length !== 0) {
-                        let vax_data_json = JSON.parse(JSON.stringify(vaxData));
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterAvailableDoses).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, AvailableDoses:vax_data_json[0].total_available_doses});
-                    }else{
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterNotAvailableDoses).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg})
-                    }
-                });
-            }else if(availability[0] === null && availability[1] !== null) {
-                await sequelize.query(
-                    'SELECT v.*, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name = ? GROUP BY v.vaccine_id HAVING sum(b.available_doses) < ?',
-                    {
-                        replacements: [vaccine_name, availability[1]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxData: object[]) => {
-                    if(vaxData.length !== 0) {
-                        let vax_data_json = JSON.parse(JSON.stringify(vaxData));
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterAvailableDoses).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, AvailableDoses:vax_data_json[0].total_available_doses});
-                    }else{
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterNotAvailableDoses).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg})
-                    }
-                });
-            }else{
-                await sequelize.query(
-                    'SELECT v.*, sum(b.available_doses) as total_available_doses FROM vaccine as v JOIN batch as b on (b.vaccine = v.vaccine_id) WHERE v.vaccine_name = ? GROUP BY v.vaccine_id HAVING sum(b.available_doses) >= ? AND sum(b.available_doses) <= ?',
-                    {
-                        replacements: [vaccine_name, availability[0], availability[1]],
-                        type: QueryTypes.SELECT
-                    }
-                ).then((vaxData: object[]) => {
-                    if(vaxData.length !== 0) {
-                        let vax_data_json = JSON.parse(JSON.stringify(vaxData));
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterAvailableDoses).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg, AvailableDoses:vax_data_json[0].total_available_doses});
-                    }else{
-                        const new_res_msg = getSuccessMsg(SuccessMsgEnum.FilterNotAvailableDoses).getMsg();
-                        res.status(new_res_msg.status).json({Message:new_res_msg.msg})
-                    }
-                });
-            }
+            }        
         }
     }catch(error:any){
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
@@ -558,7 +407,6 @@ export async function addVaccination(vaccine_id:number, batch:string, user_key:s
         await Batch.decrement(["available_doses"], {by:1, where:{vaccine:vaccine_id, batch:batch}});
         const new_res_msg = getSuccessMsg(SuccessMsgEnum.NewVaccination).getMsg();
         res.status(new_res_msg.status).json({Message:new_res_msg.msg, Vaccination:vaxData});
-        
     }catch(error:any){
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
     }
@@ -571,7 +419,6 @@ export async function downloadPDF(req_user: any, res:any){
 
         if(req_user.role === "Admin"){
             user_key = req_user.userKeyClient; // admin need to get the client key
-
         } else {
             user_key = req_user.userKey; // client have already his personal key in token
         }
@@ -588,7 +435,7 @@ export async function downloadPDF(req_user: any, res:any){
             replacements: { key: user_key },
             type: QueryTypes.SELECT
             }
-        )
+        );
 
         console.log("all vaccinations: ",vaccinations);
         const vaccinations_json = JSON.parse(JSON.stringify(vaccinations));
@@ -650,7 +497,7 @@ export async function vaccinationsJson(req_user: any, vax_name:string, vaccinati
             replacements: { key: user_key },
             type: QueryTypes.SELECT
             }
-        )
+        );
 
         console.log("all vaccinations: ",vaccinations);
         const vaccinations_json = JSON.parse(JSON.stringify(vaccinations));
@@ -660,27 +507,22 @@ export async function vaccinationsJson(req_user: any, vax_name:string, vaccinati
         if(vax_name === null && vaccination_date === null){
             const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
             res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:vaccinations_json});
-            
         }else if(vax_name !== null && vaccination_date === null){
             const listFilteredName = vaccinations_json.filter((vaccination: { vaccine_name: string; })  => vaccination.vaccine_name === vax_name);
             const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
             res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFilteredName});
-
         }else if(vax_name === null && vaccination_date !== null){
-            let listFilteredDate;
-            
+            let listFilteredDate;           
             if(vaccination_date[0] !== null && vaccination_date[1] === null){ // filter >
                 listFilteredDate = vaccinations_json.filter((vaccination: { timestamp_vc: Date; }) => 
                 vaccination.timestamp_vc > vaccination_date[0]);
                 const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
                 res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFilteredDate});     
-
             }else if(vaccination_date[0] === null && vaccination_date[1] !== null){ // filter <
                 listFilteredDate = vaccinations_json.filter((vaccination: { timestamp_vc: Date; })  => 
                 vaccination.timestamp_vc < vaccination_date[1]);
                 const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
                 res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFilteredDate});    
-
             }else if(vaccination_date[0] !== null && vaccination_date[1] !== null){ // filter >= <=
                 listFilteredDate = vaccinations_json.filter((vaccination: { timestamp_vc: Date; })  => 
                 vaccination.timestamp_vc >= vaccination_date[0] && vaccination.timestamp_vc <= vaccination_date[1]);
@@ -694,13 +536,11 @@ export async function vaccinationsJson(req_user: any, vax_name:string, vaccinati
                 vaccination.timestamp_vc > vaccination_date[0] && vaccination.vaccine_name === vax_name);
                 const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
                 res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFiltered});    
-
             }else if(vaccination_date[0] === null && vaccination_date[1] !== null){ // filter <
                 listFiltered = vaccinations_json.filter((vaccination: { timestamp_vc: Date; vaccine_name:string})  => 
                 vaccination.timestamp_vc < vaccination_date[1] && vaccination.vaccine_name === vax_name);
                 const new_res_msg = getSuccessMsg(SuccessMsgEnum.VaccinationsList).getMsg();
                 res.status(new_res_msg.status).json({Message:new_res_msg.msg, VaccinationsList:listFiltered});    
-
             }else if(vaccination_date[0] !== null && vaccination_date[1] !== null){ // filter >= <=
                 listFiltered = vaccinations_json.filter((vaccination: { timestamp_vc: Date; vaccine_name:string})  => 
                 vaccination.timestamp_vc >= vaccination_date[0] && vaccination.timestamp_vc <= vaccination_date[1] && vaccination.vaccine_name === vax_name);
@@ -865,7 +705,7 @@ export async function coverageDataUser(req_user:any, format:string, order_by:str
                 res.writeHead(200, {
                 'Content-Length': Buffer.byteLength(pdfData),
                 'Content-Type': 'application/pdf',
-                'Content-disposition': 'attachment;filename=dati_copertura_vaccinale.pdf',})
+                'Content-disposition': 'attachment;filename=dati_copertura_vaccinale.pdf'})
                 .end(pdfData);
             });
 
@@ -878,7 +718,6 @@ export async function coverageDataUser(req_user:any, format:string, order_by:str
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
     }
 }
-
 
 // get statistics
 export async function statistics(res:any){
@@ -896,14 +735,14 @@ export async function statistics(res:any){
         // get statistics for each vaccin in db
         for (let index = 0; index < vaxs_list.length; index++) {
             console.log(`vaxs_list[${index}]:`, vaxs_list[index]);
-            const vaccinations = await Vaccination.findAll({attributes:["timestamp_vc"], where: { vaccine:vaxs_list[index]}}) // select vaccinations for specific vaccine
+            const vaccinations = await Vaccination.findAll({attributes:["timestamp_vc"], where: { vaccine:vaxs_list[index]}}); // select vaccinations for specific vaccine
             console.log(`vaxs_list[${index}]:`, vaxs_list[index]);
             console.log(vaccinations);
             const parsed_vaccinations = JSON.parse(JSON.stringify(vaccinations));
             console.log(parsed_vaccinations);
             const months = parsed_vaccinations.map((vaccination: { timestamp_vc:string; }) => {
             const timestamp = new Date(vaccination.timestamp_vc);
-            return timestamp.getMonth()+1})
+            return timestamp.getMonth()+1});
             console.log(months); // [4, 12, 12]
             const aggregate_months = months.reduce((acc:any, month:number) => {
                 (acc[month] = acc[month] + 1 || 1);
@@ -913,8 +752,7 @@ export async function statistics(res:any){
             let m:number;
             for(m=1; m<=12; m++){
                 if(Number(aggregate_months[m])){
-                    console.log(`m in months: ${m}`);
-                    
+                    console.log(`m in months: ${m}`);                   
                 } else {
                     console.log(`m not in months: ${m}`);
                     aggregate_months[m]= 0;
@@ -923,7 +761,7 @@ export async function statistics(res:any){
             console.log(aggregate_months);  // { '1': 0, '2': 0 ... '4': 1,'5': 0,.... '12': 2 }
 
             
-            const list_aggr_months = Object.values(aggregate_months) // [0,0 ... 1,0,.... 2 ]
+            const list_aggr_months = Object.values(aggregate_months); // [0,0 ... 1,0,.... 2 ]
             console.log("list_aggr_months: ", list_aggr_months);
             
             const min = list_aggr_months.reduce((prev:any, current:any) => Math.min(prev,current));
@@ -968,7 +806,7 @@ export async function statistics(res:any){
             {
             type: QueryTypes.SELECT
             }
-        )
+        );
 
         const coverage_expired_users_json = JSON.parse(JSON.stringify(coverage_expired_users));
       
@@ -1005,7 +843,7 @@ export async function statistics(res:any){
 
         const new_res_msg = getSuccessMsg(SuccessMsgEnum.Statistics).getMsg();
         res.status(new_res_msg.status).json({Message:new_res_msg.msg, Statistics:statistics_list});
-        // res.send("here you are your statistcs with month aggregation!")
+        // res.send("here you are your statistcs with month aggregation!");
 
 
     }catch(error:any){
