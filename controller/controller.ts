@@ -902,9 +902,9 @@ export async function statistics(res:any){
         console.log(users_90, users_30, users_31_90);
 
         const users_statistics = {
-            "users not covered for more than 90 days": users_90,
-            "users not covered for less than 31 days": users_30,
-            "users not covered between 31 and 90 days": users_31_90,
+            "users_90": users_90,
+            "users_30": users_30,
+            "users_31_90": users_31_90,
         }
 
         statistics_list.push(users_statistics);
