@@ -80,7 +80,7 @@ app.get('/coverageExpiredUserList', CoR.checkAdmin, CoR.checkCoverageExpiredUser
 app.get('/coverageDataUser', CoR.checkTokenField, CoR.checkCoverageDataUserFilters, (req:any,res:any) => {
     //res.send("ok, you can pass to controller");
     if(!Object.keys(req.body).includes('order_by')) req.body.order_by = null;
-    controller.coverageDataUser(req.body.format, req.body.order_by, res);
+    controller.coverageDataUser(req.user, req.body.format, req.body.order_by, res);
 });
 
 // Route to get statistics 

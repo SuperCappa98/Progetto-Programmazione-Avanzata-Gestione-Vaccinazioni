@@ -7,7 +7,7 @@ import { Delivery } from '../models/Delivery';
 import { DBSingleton } from "../singleton/DBSingleton";
 import { QueryTypes, Sequelize } from 'sequelize';
 import { Vaccination } from '../models/Vaccination';
-import { generateCustomerInformation, generateHeader, generateInvoiceTable } from '../utils/generate_pdf';
+import { generateCustomerInformation, generateHeader, generateVaccinationTable, generateCoverageDataUserTable } from '../utils/generate_pdf';
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 import { SingleVax } from '../utils/statistics';
@@ -618,7 +618,7 @@ export async function downloadPDF(req_user: any, res:any){
 
         generateHeader(doc);
         generateCustomerInformation(doc, user_key);
-        generateInvoiceTable(doc, vaccinations_json);
+        generateVaccinationTable(doc, vaccinations_json);
         doc.end(); 
 
     }catch(error:any){
@@ -728,7 +728,7 @@ export async function coverageExpiredUserList(vax_name:string, days_coverage_exp
             {
             type: QueryTypes.SELECT
             }
-        )
+        );
 
         const coverage_expired_users_json = JSON.parse(JSON.stringify(coverage_expired_users));
         let listFiltered;
@@ -780,9 +780,100 @@ export async function coverageExpiredUserList(vax_name:string, days_coverage_exp
     }
 }
 
-export async function coverageDataUser(format:string, order_by:string, res:any){
+export async function coverageDataUser(req_user:any, format:string, order_by:string, res:any){
     try{
+        var user_key;
+        if(req_user.role === "Admin"){
+            user_key = req_user.userKeyClient; // admin need to get the client key
+        } else {
+            user_key = req_user.userKey; // client have already his personal key in token
+        }
+        user_key = user_key.toUpperCase();
+
+        let coverage_data_user;
+        if(order_by == null) {
+            coverage_data_user = await sequelize.query(
+                `SELECT vaxs.user_key, vax.vaccine_name, max(vaxs.timestamp_vc) AS last_vaccination_timestamp, 
+                CURRENT_DATE - (vax.coverage + DATE(max(vaxs.timestamp_vc))) AS days_coverage
+                FROM vaccine AS vax JOIN vaccination AS vaxs ON (vaxs.vaccine = vax.vaccine_id)
+                WHERE user_key = ?
+                GROUP BY vax.vaccine_name, vaxs.user_key, vax.coverage`,
+                {
+                    replacements: [user_key],
+                    type: QueryTypes.SELECT
+                }
+            );
+        }else if(order_by == "ASC"){
+            coverage_data_user = await sequelize.query(
+                `SELECT vaxs.user_key, vax.vaccine_name, max(vaxs.timestamp_vc) AS last_vaccination_timestamp, 
+                CURRENT_DATE - (vax.coverage + DATE(max(vaxs.timestamp_vc))) AS days_coverage
+                FROM vaccine AS vax JOIN vaccination AS vaxs ON (vaxs.vaccine = vax.vaccine_id)
+                WHERE user_key = ?
+                GROUP BY vax.vaccine_name, vaxs.user_key, vax.coverage
+                ORDER BY abs(CURRENT_DATE - (vax.coverage + DATE(max(vaxs.timestamp_vc)))) ASC`,
+                {
+                    replacements: [user_key],
+                    type: QueryTypes.SELECT
+                }
+            );
+        }else if(order_by == "DESC"){
+            coverage_data_user = await sequelize.query(
+                `SELECT vaxs.user_key, vax.vaccine_name, max(vaxs.timestamp_vc) AS last_vaccination_timestamp, 
+                CURRENT_DATE - (vax.coverage + DATE(max(vaxs.timestamp_vc))) AS days_coverage
+                FROM vaccine AS vax JOIN vaccination AS vaxs ON (vaxs.vaccine = vax.vaccine_id)
+                WHERE user_key = ?
+                GROUP BY vax.vaccine_name, vaxs.user_key, vax.coverage
+                ORDER BY abs(CURRENT_DATE - (vax.coverage + DATE(max(vaxs.timestamp_vc)))) DESC`,
+                {
+                    replacements: [user_key],
+                    type: QueryTypes.SELECT
+                }
+            );
+        }
         
+        const coverage_data_user_json = JSON.parse(JSON.stringify(coverage_data_user));
+        //console.log(coverage_data_user_json);
+
+        coverage_data_user_json.forEach((data_user: {days_coverage?:number}) => {
+            if (data_user.days_coverage !== undefined && data_user.days_coverage < 0) {
+                data_user.days_coverage = Math.abs(data_user.days_coverage);
+                delete Object.assign(data_user, {["days_to_coverage"]: data_user["days_coverage"]})["days_coverage"]; 
+            }else if (data_user.days_coverage !== undefined && data_user.days_coverage >= 0) {
+                delete Object.assign(data_user, {["days_from_coverage"]: data_user["days_coverage"]})["days_coverage"];
+            }
+        });
+
+        //console.log(coverage_data_user_json);
+
+        if(format == "JSON") {
+            const new_res_msg = getSuccessMsg(SuccessMsgEnum.CoverageDataUser).getMsg();
+            res.status(new_res_msg.status).json({Message:new_res_msg.msg, CoverageDataUser:coverage_data_user_json});
+        }else if(format == "PDF") {
+            let doc = new PDFDocument({ margin: 50, bufferPages:true, pdfVersion: '1.5', tagged:true, displayTitle:true});
+            console.log(doc);
+
+            // Document meta data
+            doc.info['Title'] = 'Dati sulla copertura vaccinale';
+    
+            let buffers: any = [];
+            doc.on('data', buffers.push.bind(buffers));
+            doc.on('end', () => {
+
+                let pdfData = Buffer.concat(buffers);
+                console.log(Buffer.byteLength(pdfData));
+            
+                res.writeHead(200, {
+                'Content-Length': Buffer.byteLength(pdfData),
+                'Content-Type': 'application/pdf',
+                'Content-disposition': 'attachment;filename=dati_copertura_vaccinale.pdf',})
+                .end(pdfData);
+            });
+
+            generateHeader(doc);
+            generateCustomerInformation(doc, user_key);
+            generateCoverageDataUserTable(doc, coverage_data_user_json);
+            doc.end(); 
+        }
     }catch(error:any){
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
     }
