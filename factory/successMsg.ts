@@ -1,5 +1,6 @@
+// Import libraries
 import {Msg} from "./Msg";
-const { StatusCode } = require('status-code-enum')
+const {StatusCode} = require('status-code-enum')
 
 
 class AppStartedSuccessMsg implements Msg{
@@ -128,6 +129,7 @@ class RedisKeySuccessMsg implements Msg{
     }
 }
 
+
 export enum SuccessMsgEnum {
     AppStarted,
     NewVax,
@@ -145,6 +147,14 @@ export enum SuccessMsgEnum {
     RedisKey
 }
 
+/**
+ * Function 'getSuccessMsg'
+ * 
+ * Function invoked by the controller when successfully ending a route
+ * 
+ * @param type Type of the success message obtained (is one of the values of the {@link SuccessMsgEnum})
+ * @returns An object of the {@link Msg} interface representing a success message  
+ */
 export function getSuccessMsg(type: SuccessMsgEnum): Msg{
     let msgval: Msg;
     switch(type){

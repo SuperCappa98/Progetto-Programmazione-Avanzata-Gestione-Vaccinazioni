@@ -1,24 +1,8 @@
-/*
-class SingleVax {
-    vaccine: string;
-    min_vaccinations: number;
-    max_vaccinations: number;
-    mean_vaccinations: number;
-    dev_vaccinations: number;
-    mean_delivery: number
-
-
-    //constructor 
-    constructor(vaccine:string, min:number, max:number, mean:number, dev:number) { 
-        this.vaccine = vaccine;
-        this.min = min;
-        this.max = max;
-        this.mean = mean;
-        this.dev = dev;
-     }  
-}
-*/
-
+/**
+ * Class 'SingleVax'
+ * 
+ * Class that has as its property the required vaccine statistics from the '/statistics' route
+ */
 export class SingleVax {
     vaccine: any;
     min_vaccinations: any;

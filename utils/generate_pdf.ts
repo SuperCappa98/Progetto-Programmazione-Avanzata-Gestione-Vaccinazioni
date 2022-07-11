@@ -1,9 +1,13 @@
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 
-  
 
-export function generateHeader(doc:any) {
+/**
+ * Functions in this file are used to generate the PDF templates 
+ * used in the '/downloadPDF' and '/coverageDataUser' routes
+ */
+
+export function generateHeader(doc:any){
     
 	doc.image('utils/logo.png', 50, 45, { width: 80 })
 		.fillColor('#444444')
@@ -14,17 +18,17 @@ export function generateHeader(doc:any) {
     
 }
 
-export function generateHr(doc:any, y:any) {
+export function generateHr(doc:any, y:any){
     doc
       .strokeColor("#aaaaaa")
       .lineWidth(1)
       .moveTo(50, y)
       .lineTo(550, y)
       .stroke();
-  }
+}
 
-  
-export function generateCustomerInformation(doc:any, user_key:string) {
+
+export function generateCustomerInformation(doc:any, user_key:string){
     doc.markContent('Span', {lang:"it-IT"});
     doc
     .fillColor("#444444")
@@ -44,10 +48,9 @@ export function generateCustomerInformation(doc:any, user_key:string) {
 	.moveDown();
     generateHr(doc, 225);
     doc.endMarkedContent();
-
 }
 
-export function generateTableRow(doc:any, y:any, c1:any, c2:any, c3:any, c4:any, table_type:string) {
+export function generateTableRow(doc:any, y:any, c1:any, c2:any, c3:any, c4:any, table_type:string){
 	doc.fontSize(10)
     doc.markContent('Span', {lang:"it-IT"});
     if(table_type == "VaccinationTable") {
@@ -66,7 +69,7 @@ export function generateTableRow(doc:any, y:any, c1:any, c2:any, c3:any, c4:any,
     doc.endMarkedContent();
 }
 
-export function generateVaccinationTable(doc:any, vaccination:any) {
+export function generateVaccinationTable(doc:any, vaccination:any){
 	let i;
 	const tableTop = 350;
 
@@ -97,11 +100,9 @@ export function generateVaccinationTable(doc:any, vaccination:any) {
             "VaccinationTable"
 		);
 	}
-
-
 }
 
-export function generateCoverageDataUserTable(doc:any, coverage_data_user:any) {
+export function generateCoverageDataUserTable(doc:any, coverage_data_user:any){
 	let i;
 	const tableTop = 350;
 
@@ -132,6 +133,4 @@ export function generateCoverageDataUserTable(doc:any, coverage_data_user:any) {
             "CoverageDataUserTable"
 		);
 	}
-
-
 }

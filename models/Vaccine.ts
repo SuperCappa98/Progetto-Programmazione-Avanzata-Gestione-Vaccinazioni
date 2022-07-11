@@ -1,9 +1,16 @@
-import { DBSingleton } from "../singleton/DBSingleton";
-import { DataTypes, Sequelize } from 'sequelize';
+// Import libraries
+import {DBSingleton} from "../singleton/DBSingleton";
+import {DataTypes, Sequelize} from 'sequelize';
+
 
 //Connection to database
 const sequelize: Sequelize = DBSingleton.getConnection();
 
+/**
+ * Model 'Vaccine'
+ * 
+ * Define the model 'Vaccine' to interface with the "vaccine" table in the PostgreSQL database
+ */
 export const Vaccine = sequelize.define('vaccine', {
     vaccine_id: {
         type: DataTypes.INTEGER(),

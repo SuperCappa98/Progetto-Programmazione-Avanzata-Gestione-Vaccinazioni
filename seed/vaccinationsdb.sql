@@ -63,7 +63,6 @@ INSERT INTO batch (batch, vaccine, available_doses, expiration_date)
   ('B', 2, 985, '2023-01-01'),
   ('C', 3, 985, '2023-01-01');
 
-
 -- --------------------------------------------------------
 
 --
@@ -84,7 +83,6 @@ CREATE TABLE delivery (
 ALTER TABLE delivery
   ADD PRIMARY KEY (batch, vaccine, delivery_date),
   ADD CONSTRAINT delivery_FK_batch FOREIGN KEY(batch, vaccine) REFERENCES batch(batch, vaccine) ON DELETE RESTRICT ON UPDATE CASCADE;
- 
 
 --
 -- Data dump for "delivery" table 
@@ -101,7 +99,6 @@ INSERT INTO delivery (batch, delivery_date, vaccine, delivery_doses)
   ('A', '2015-01-01', 1, 1000),
   ('B', '2015-01-01', 2, 1000),
   ('C', '2015-01-01', 3, 1000);
-
 
 -- --------------------------------------------------------
 
@@ -138,11 +135,6 @@ INSERT INTO users (user_key)
     ('YNGDXW81C43H688F'),
     ('VDVBWI29S26L744I'),
     ('SQJKTG50R59H702Z');
-
-    
-    
-
-
 
 -- --------------------------------------------------------
 
@@ -228,7 +220,3 @@ INSERT INTO vaccination (batch, vaccine, user_key, timestamp_vc)
   ('A', 1, 'NJBWMP51S60B629A', '2018-09-01 15:00:00'),
   ('A', 1, 'NJBWMP51S60B629A', '2019-11-01 15:00:00'),
   ('A', 1, 'NJBWMP51S60B629A', '2020-06-01 15:00:00');
-
-  
-
-

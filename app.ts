@@ -1,12 +1,11 @@
 // Import libraries
 'use strict';
-import express from "express";
+require('dotenv').config();
 import * as controller from './controller/controller';
 import * as CoR from './middleware/CoR';
+import express from "express";
 import {SuccessMsgEnum, getSuccessMsg} from "./factory/successMsg";
-import { string } from "mathjs";
-import { createClient } from 'redis';
-require('dotenv').config();
+import {createClient} from 'redis';
 
 
 // Creating express object (in this case, the app)
@@ -19,19 +18,14 @@ const HOST = '0.0.0.0';
 // Parse data into request body
 app.use(express.json());
 
+// Checks whether the REDIS key for the route "/vaccinationsJson" is present and if so, extracts the associated value from the REDIS server
 app.use(async function (req, res,next) {
     console.log(req.path);
     console.log(req.headers.authorization);
 
     if(req.path==="/vaccinationsJson" && !req.headers.authorization && typeof(req.body.redis_key) === "string"){
         const redis = require('redis');
-        const client = createClient({ url: 'redis://'+process.env.REDISHOST+':'+process.env.REDISPORT });
-        /*
-        const client = redis.createClient({
-            host: process.env.REDISHOST,
-            port: process.env.REDISPORT
-        })
-        */
+        const client = createClient({ url: 'redis://' + process.env.REDISHOST + ':' + process.env.REDISPORT });
 
         client.on('error', (err:any) => console.log('Redis Client Error', err));
 
@@ -100,7 +94,6 @@ app.get('/downloadPDF', CoR.checkTokenField, (req:any,res:any) => {
     controller.downloadPDF(req.user, res);
 });
 
-
 // Route to get user vaccinations in JSON
 app.get('/vaccinationsJson', CoR.checkTokenField, CoR.checkFilterValue, (req:any,res:any) => {
     if(!Object.keys(req.body).includes('vax_name')) req.body.vax_name = null;
@@ -123,7 +116,6 @@ app.get('/coverageExpiredUserList', CoR.checkAdmin, CoR.checkCoverageExpiredUser
 
 // Route that depending on the format returns the required user coverage data in JSON or PDF that can be sorted ascending or descending by days coverage
 app.get('/coverageDataUser', CoR.checkTokenField, CoR.checkCoverageDataUserFilters, (req:any,res:any) => {
-    //res.send("ok, you can pass to controller");
     if(!Object.keys(req.body).includes('order_by')) req.body.order_by = null;
     controller.coverageDataUser(req.user, req.body.format, req.body.order_by, res);
 });
