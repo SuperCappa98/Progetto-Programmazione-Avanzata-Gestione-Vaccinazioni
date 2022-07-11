@@ -90,3 +90,9 @@ export const unexpectedRoute = [
     vaxMiddleware.routeNotFound,
     errorHandler.errorHandler
 ]
+
+export const checkUserData = [
+    vaxMiddleware.checkUserKey,
+    vaxMiddleware.checkUserName,
+    errorHandler.errorHandler
+]

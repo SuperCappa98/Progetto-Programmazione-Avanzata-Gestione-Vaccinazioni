@@ -10,6 +10,7 @@ import { generateCustomerInformation, generateHeader, generateVaccinationTable, 
 const PDFDocument = require('pdfkit');
 import { SingleVax } from '../utils/statistics';
 const math = require('mathjs');
+require('dotenv').config();
 
 const sequelize: Sequelize = DBSingleton.getConnection();
 
@@ -474,17 +475,13 @@ export async function downloadPDF(req_user: any, res:any){
 }
 
 // get JSON with all the vaccinations for a user
-export async function vaccinationsJson(req_user: any, vax_name:string, vaccination_date:Array<Date>, res:any){
+export async function vaccinationsJson(user_key: any, vax_name:string, vaccination_date:Array<Date>, res:any){
     try{
-        var user_key;
+
         if(vax_name !== null){
             vax_name = vax_name.toLowerCase();
         }
-        if(req_user.role === "Admin"){
-            user_key = req_user.userKeyClient; // admin need to get the client key
-        } else {
-            user_key = req_user.userKey; // client have already his personal key in token
-        }
+
         user_key = user_key.toUpperCase();
 
         // get the list for all the vaccinations
@@ -850,6 +847,47 @@ export async function statistics(res:any){
         controllerErrors(ErrorMsgEnum.InternalServer, error, res);
     }
 }
+
+
+export async function generateRedisKey(user_key:string, name:string, surname:string, res:any){
+    try{
+        const redis = require('redis');
+        const client = redis.createClient({
+            host: process.env.REDISHOST,
+            port: process.env.REDISPORT
+        })
+
+        client.on('error', (err:any) => console.log('Redis Client Error', err));
+
+        await client.on('connect', function() {
+            console.log('Connected!');
+        });
+
+        await client.connect();
+
+        let random_key = new Date().valueOf();
+        const key = random_key.toString();
+        console.log(random_key);
+
+        let jwt = require('jsonwebtoken');
+        let token = jwt.sign({ name: name, surname: surname, userKey: user_key, role: 'User' }, process.env.SECRET_KEY);
+
+        await client.set(key, token);
+        const value = await client.get(key);
+        console.log(value);
+        await client.expire(key, 60);
+
+        client.quit();
+
+        const new_res_msg = getSuccessMsg(SuccessMsgEnum.RedisKey).getMsg();
+        res.status(new_res_msg.status).json({Message:new_res_msg.msg, RedisKey:key});
+      
+
+    }catch(error:any){
+        controllerErrors(ErrorMsgEnum.InternalServer, error, res);
+    }
+}
+      
 
 
 

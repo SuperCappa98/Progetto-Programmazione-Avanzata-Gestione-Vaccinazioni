@@ -465,3 +465,11 @@ export const routeNotFound = (req: any, res: any, next: any) => {
     next(ErrorMsgEnum.RouteNotFound);
 };
 
+export const checkUserName = async (req: any, res: any, next: any) => {
+    if(typeof req.body.name === "string" && typeof req.body.surname === "string") {
+            next();
+    }else{
+        next(ErrorMsgEnum.NotValidValue);
+    }
+};
+

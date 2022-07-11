@@ -119,6 +119,15 @@ class StatisticsSuccessMsg implements Msg{
     }
 }
 
+class RedisKeySuccessMsg implements Msg{
+    getMsg(): { status: number; msg: string; } {
+        return {
+            status: StatusCode.SuccessOK,
+            msg: "Success OK - Temporary Redis Key is successfully displayed"
+        }
+    }
+}
+
 export enum SuccessMsgEnum {
     AppStarted,
     NewVax,
@@ -132,7 +141,8 @@ export enum SuccessMsgEnum {
     VaccinationsList,
     CoverageExpiredUserList,
     CoverageDataUser,
-    Statistics
+    Statistics,
+    RedisKey
 }
 
 export function getSuccessMsg(type: SuccessMsgEnum): Msg{
@@ -176,6 +186,9 @@ export function getSuccessMsg(type: SuccessMsgEnum): Msg{
             break;
         case SuccessMsgEnum.Statistics:
             msgval = new StatisticsSuccessMsg();
+            break;
+        case SuccessMsgEnum.RedisKey:
+            msgval = new RedisKeySuccessMsg();
             break;
     }
     return msgval;

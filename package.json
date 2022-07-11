@@ -11,6 +11,7 @@
     "mathjs": "^10.6.4",
     "pdfkit": "^0.13.0",
     "pg": "^8.7.3",
+    "redis": "^4.2.0",
     "sequelize": "^6.21.2",
     "sqlite3": "^5.0.8",
     "status-code-enum": "^1.0.0"

@@ -4,6 +4,9 @@ import express from "express";
 import * as controller from './controller/controller';
 import * as CoR from './middleware/CoR';
 import {SuccessMsgEnum, getSuccessMsg} from "./factory/successMsg";
+import { string } from "mathjs";
+import { createClient } from 'redis';
+require('dotenv').config();
 
 
 // Creating express object (in this case, the app)
@@ -15,6 +18,38 @@ const HOST = '0.0.0.0';
 
 // Parse data into request body
 app.use(express.json());
+
+app.use(async function (req, res,next) {
+    console.log(req.path);
+    console.log(req.headers.authorization);
+
+    if(req.path==="/vaccinationsJson" && !req.headers.authorization && typeof(req.body.redis_key) === "string"){
+        const redis = require('redis');
+        const client = redis.createClient({
+            host: process.env.REDISHOST,
+            port: process.env.REDISPORT
+        })
+
+        client.on('error', (err:any) => console.log('Redis Client Error', err));
+
+        await client.on('connect', function() {
+            console.log('Connected!');
+        });
+
+        await client.connect();
+
+        const value = await client.get(req.body.redis_key); // value is a bearer token
+        console.log(value);
+        client.quit();
+        console.log(value?.toString());
+        req.headers.authorization = "Bearer " + value?.toString(); // put token in headers.autorization
+        console.log("req.headers.authorization:", req.headers.authorization);
+        next();
+
+    }else{
+        next();
+    }
+  });
 
 // Token Validation
 app.use(CoR.jwt);
@@ -62,11 +97,18 @@ app.get('/downloadPDF', CoR.checkTokenField, (req:any,res:any) => {
     controller.downloadPDF(req.user, res);
 });
 
+
 // Route to get user vaccinations in JSON
 app.get('/vaccinationsJson', CoR.checkTokenField, CoR.checkFilterValue, (req:any,res:any) => {
     if(!Object.keys(req.body).includes('vax_name')) req.body.vax_name = null;
     if(!Object.keys(req.body).includes('vaccination_date')) req.body.vaccination_date = null;
-    controller.vaccinationsJson(req.user, req.body.vax_name, req.body.vaccination_date, res);
+    var user_key;
+    if(req.user.role === "Admin"){
+        user_key = req.user.userKeyClient; // admin need to get the client key
+    } else {
+        user_key = req.user.userKey; // client have already his personal key in token
+    }
+    controller.vaccinationsJson(user_key, req.body.vax_name, req.body.vaccination_date, res);
 });
 
 // Route to display list of people with expired coverage that can be filtered by vaccine name and/or number of days since coverage expired
@@ -86,6 +128,11 @@ app.get('/coverageDataUser', CoR.checkTokenField, CoR.checkCoverageDataUserFilte
 // Route to get statistics 
 app.get('/statistics', CoR.checkAdmin, (req:any,res:any) => {
     controller.statistics(res);
+});
+
+// Route to generate redis temporary key
+app.get('/generateRedisKey', CoR.checkAdmin, CoR.checkUserData, (req:any,res:any) => {
+    controller.generateRedisKey(req.body.user_key, req.body.name, req.body.surname, res);
 });
 
 // Unexpected route management
