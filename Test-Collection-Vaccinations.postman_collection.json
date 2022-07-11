@@ -1,0 +1,3314 @@
+{
+	"info": {
+		"_postman_id": "77d9ee97-df90-4765-a27b-43426986d7c9",
+		"name": "Test Collection Vaccinations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7852921"
+	},
+	"item": [
+		{
+			"name": "TokenValidation",
+			"item": [
+				{
+					"name": "No Request Header - KO",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"host": true,
+							"user-agent": true,
+							"accept": true,
+							"accept-encoding": true,
+							"connection": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Token - Wrong key - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiR2FpYSIsInN1cm5hbWUiOiJGcmF0dGVzaSIsInJvbGUiOiJBZG1pbiIsInVzZXJLZXkiOiJGUlRHQUk5NlI0NEEyNzFQIn0.m81aNp74a6JyfrbKdrkhWtsaR8ZY4jQdE-7z_nQxcFo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "No Name Field in Token Payload - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdXJuYW1lIjoiRnJhdHRlc2kiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5IjoiRlJUR0FJOTZSNCJ9.I14k3E8DEHZAcSO7TiHQxVadZKttEz5BPSah0VobKTU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Key Token Payload Bad Formatted - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiR2FpYSIsInN1cm5hbWUiOiJGcmF0dGVzaSIsInJvbGUiOiJBZG1pbiIsInVzZXJLZXkiOiJGUlRHQUk5NlI0In0.r8qUZHco7SV9tHiZWFmn5mdGvUEPQhB3eboR1QXlZiE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Valid Token - Well Formatted - OK",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiR2FpYSIsInN1cm5hbWUiOiJGcmF0dGVzaSIsInJvbGUiOiJBZG1pbiIsInVzZXJLZXkiOiJGUlRHQUk5NlI0NEEyNzFQIn0.4hlTzlEvl-ZEHfp9TvclbVAD7qt504PTLkE24sCgRWg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/addVax",
+			"item": [
+				{
+					"name": "NOT Admin in route - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiR2lvcmdpbyIsInN1cm5hbWUiOiJGYW5lc2kiLCJyb2xlIjoiVXNlciIsInVzZXJLZXkiOiJGTlNHUkc1N0IwMkg1MDFaIn0.C5cP5Jo7Dw4f1DebTzYmVFeu1HdtAoNuKYpIFHxZcfY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/addVax",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVax"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vax data bad formatted - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vaxName\": \"vaxName\",\n    \"coverage\": 365.5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVax",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVax"
+							],
+							"query": [
+								{
+									"key": "vaxName",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "coverage",
+									"value": "365",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vax name already exists - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vaxName\": \"Vaxzevria\",\n    \"coverage\": 365\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVax",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVax"
+							],
+							"query": [
+								{
+									"key": "vaxName",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "coverage",
+									"value": "365",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert vax - OK",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vaxName\": \"NewVax\",\n    \"coverage\": 180\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVax",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVax"
+							],
+							"query": [
+								{
+									"key": "vaxName",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "coverage",
+									"value": "365",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/addDoses",
+			"item": [
+				{
+					"name": "NOT valid value for doses - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_doses\": -45,\n    \"batch\": \"abc456\",\n    \"delivery_date\": \"2022-06-23\",\n    \"expiration_date\": \"2023-06-23\",\n    \"vaccine_id\": 1\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addDoses"
+							],
+							"query": [
+								{
+									"key": "vaxName",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "coverage",
+									"value": "365",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid value for batch - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_doses\": 5,\n    \"batch\": \"asidkjlaksdjfaljdfflaskjdflaasidkjlaksdjfaljdfflaskjdflaasidkjlaksdjfaljdfflaskjdfla\",\n    \"delivery_date\": \"2022-06-23\",\n    \"expiration_date\": \"2023-06-23\",\n    \"vaccine_id\": 1\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addDoses"
+							],
+							"query": [
+								{
+									"key": "vaxName",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "coverage",
+									"value": "365",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid value for delivery date - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_doses\": 5,\n    \"batch\": \"abc456\",\n    \"delivery_date\": null,\n    \"expiration_date\": \"2023-06-23\",\n    \"vaccine_id\": 1\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid value for expiration date - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_doses\": 5,\n    \"batch\": \"asdfghj\",\n    \"delivery_date\": \"2022-04-23\",\n    \"expiration_date\": \"2020-04-22\",\n    \"vaccine_id\": 1\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT int vaccine id  - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_doses\": 5,\n    \"batch\": \"abc456\",\n    \"delivery_date\": \"2022-02-22\",\n    \"expiration_date\": \"2023-06-19\",\n    \"vaccine_id\": \"vaccine\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT found in DB vaccine id  - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_doses\": 5,\n    \"batch\": \"abc456\",\n    \"delivery_date\": \"2022-01-20\",\n    \"expiration_date\": \"2023-06-23\",\n    \"vaccine_id\": 300\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delivery already in DB  - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_doses\": 500,\n    \"batch\": \"CDE7845\",\n    \"delivery_date\": \"2022-04-13\",\n    \"expiration_date\": \"2024-07-01\",\n    \"vaccine_id\": 1\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Expiration date doesn't match - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_doses\": 500,\n    \"batch\": \"CDE7845\",\n    \"delivery_date\": \"2022-06-13\",\n    \"expiration_date\": \"2022-12-16\",\n    \"vaccine_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert Batch and Delivery - OK",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_doses\": 257,\n    \"batch\": \"lotto4\",\n    \"delivery_date\": \"2022-05-30\",\n    \"expiration_date\": \"2024-06-30\",\n    \"vaccine_id\": 1\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Batch and insert Delivery - OK",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_doses\": 500,\n    \"batch\": \"CDE7845\",\n    \"delivery_date\": \"2022-04-26\",\n    \"expiration_date\": \"2022-12-15\",\n    \"vaccine_id\": 1\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addDoses"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/vaxList",
+			"item": [
+				{
+					"name": "NOT valid value in filter array for vax name - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": [12, \"spikevax\", null]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT found in DB vax name in filter array - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": [\"Vaxzevria\", \"NOVAX\", \"Spikevax\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid values in filter array for availability - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"availability\":  [-12, \"string\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid length of filter array for availability - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"availability\":  [12, null, 15]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid values in filter array for expiration date - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"expiration_date\":  [456346,\"2020-06-26\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid length of filter array for expiration date - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"expiration_date\":  [null,\"2020-06-26\", \"2025-12-25\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vax list without filters - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vax list with only vax name filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": [\"COMIRNATY\", \"spikevax\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vax list with only availability filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"availability\":  [979, null]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vax list with only expiration date filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"expiration_date\":  [null, \"2024-06-26\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vax list with vax name and expiration date filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": [\"Spikevax\"],\r\n    \"expiration_date\":  [\"2022-12-15\", null]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vax list with vax name and availability filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": [\"Vaxzevria\", \"spikevax\"],\r\n    \"availability\":  [null, 1200]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vax list with availability and expiration date filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"availability\":  [null, 1500],\r\n    \"expiration_date\":  [\"2022-12-15\", null]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vax list with all filters - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": [\"VAXZEVRIA\", \"comirnaty\"],\r\n    \"availability\":  [200, 1500],\r\n    \"expiration_date\":  [\"2022-12-15\", \"2024-06-26\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaxList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaxList"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/availableVaxDoses",
+			"item": [
+				{
+					"name": "NOT valid value for vax name - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/availableVaxDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"availableVaxDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT found in DB vax name - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": \"NOVAX\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/availableVaxDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"availableVaxDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid length of filter array for availability - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": \"Spikevax\",\r\n    \"availability\":  [60, 80, null]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/availableVaxDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"availableVaxDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Answer about available doses without filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": \"COMIRNATY\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/availableVaxDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"availableVaxDoses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Answer about available doses with filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": \"Spikevax\",\r\n    \"availability\":  [60, 979]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/availableVaxDoses",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"availableVaxDoses"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/addVaccination",
+			"item": [
+				{
+					"name": "NOT valid value for user key - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": \"ABCD\",\n    \"vaccine_id\": 3,\n    \"batch\": \"000190A\",\n    \"timestamp_vc\": \"2022-06-30 13:42:25\"\n}\n    ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVaccination",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVaccination"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT found in DB user key - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": \"ABCDEF12A12A121A\",\n    \"vaccine_id\": 3,\n    \"batch\": \"000190A\",\n    \"timestamp_vc\": \"2022-06-28 13:42:25\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVaccination",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVaccination"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid value for batch - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": \"RMGLRA71R68H501V\",\n    \"vaccine_id\": 3,\n    \"batch\": null,\n    \"timestamp_vc\": \"2022-06-30 13:42:25\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVaccination",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVaccination"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT found in DB batch key (id/batch) - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": \"RMGLRA71R68H501V\",\n    \"vaccine_id\": 10,\n    \"batch\": \"000190A\",\n    \"timestamp_vc\": \"2022-06-30 13:42:25\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVaccination",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVaccination"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NO MORE doses available - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": \"RMGLRA71R68H501V\",\n    \"vaccine_id\": 1,\n    \"batch\": \"NOdosesBatch\",\n    \"timestamp_vc\": \"2022-06-30 13:42:25\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVaccination",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVaccination"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid value for timestamp (> today) - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": \"RMGLRA71R68H501V\",\n    \"vaccine_id\": 2,\n    \"batch\": \"FG4493\",\n    \"timestamp_vc\": \"2024-06-30 13:42:25\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVaccination",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVaccination"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Doses in batch expired - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": \"RMGLRA71R68H501V\",\n    \"vaccine_id\": 3,\n    \"batch\": \"123456Z\",\n    \"timestamp_vc\": \"2022-06-30 13:42:25\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVaccination",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVaccination"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User still covered - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": \"RMGLRA71R68H501V\",\n    \"vaccine_id\": 1,\n    \"batch\": \"ABV2856\",\n    \"timestamp_vc\": \"2022-06-30 13:42:25\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVaccination",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVaccination"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert vaccination - OK",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": \"RGNGNN86E53F839L\",\n    \"vaccine_id\": 2,\n    \"batch\": \"SC2606\",\n    \"timestamp_vc\": \"2022-07-05 13:42:25\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/addVaccination",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVaccination"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/downloadPDF",
+			"item": [
+				{
+					"name": "Get PDF role:Admin - NOT valid value for user key - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjpudWxsfQ.j7o4Or9goZWaOyqVX5Vgz2PlkR4HiIZDwh3_4_lnTQA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/downloadPDF",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"downloadPDF"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get PDF role:Admin - Case with 0 vaccinations - OK",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiQUFBQkJCODBBMDNBMDAwVSJ9.vtrToP0sQntFpPwW66RDmO5A3_XxQzSjAYjgfwPucH0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/downloadPDF",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"downloadPDF"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get PDF role:Admin - OK",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiUk1HTFJBNzFSNjhINTAxViJ9.OdjpKygZE3q-elLaPEmsurk3Js21uFBbB83-7yZQIPk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/downloadPDF",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"downloadPDF"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get PDF role:User - OK",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhdHRpIiwidXNlcktleSI6IkdUVE5EUjgwQTAzQTI3MVUiLCJyb2xlIjoiVXNlciJ9.yIwgpiJ1CEanq6upZsG5DWk2hMb8Z62n-FiYhxzyUoU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/downloadPDF",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"downloadPDF"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "/vaccinationsJson",
+			"item": [
+				{
+					"name": "Get JSON role:Admin - NOT valid value for user key - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjpudWxsfQ.j7o4Or9goZWaOyqVX5Vgz2PlkR4HiIZDwh3_4_lnTQA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vax_name\": \"vaxzevria\",\n    \"vaccination_date\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaccinationsJson",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaccinationsJson"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON role:Admin - NOT valid values in filter array for vaccination date - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiUk1HTFJBNzFSNjhINTAxViJ9.OdjpKygZE3q-elLaPEmsurk3Js21uFBbB83-7yZQIPk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vax_name\": \"vaxzevria\",\n    \"vaccination_date\": [\"2022-01-01\", \"2010-01-01\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaccinationsJson",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaccinationsJson"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON role:Admin - without filters - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaccinationsJson",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaccinationsJson"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON role: Admin - filter name - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vax_name\": \"comirnaty\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaccinationsJson",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaccinationsJson"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON role:Admin - filter date > - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vaccination_date\": [\"2019-06-01\", null]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaccinationsJson",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaccinationsJson"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON role:Admin - filter date < - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vaccination_date\": [null, \"2020-06-01\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaccinationsJson",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaccinationsJson"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON role:Admin - filter date > < - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vaccination_date\": [\"2020-01-01\", \"2020-10-29\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaccinationsJson",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaccinationsJson"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON role:Admin - filter date < & name - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vax_name\": \"Spikevax\",\n    \"vaccination_date\": [\"2019-06-01\", null]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaccinationsJson",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaccinationsJson"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON role:User  - filter date < - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhdHRpIiwidXNlcktleSI6IkdUVE5EUjgwQTAzQTI3MVUiLCJyb2xlIjoiVXNlciJ9.yIwgpiJ1CEanq6upZsG5DWk2hMb8Z62n-FiYhxzyUoU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vaccination_date\": [null, \"2022-01-01\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaccinationsJson",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaccinationsJson"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON role: User with redis key - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"redis_key\":\"1657509442535\",\n    \"vax_name\": \"Spikevax\",\n    \"vaccination_date\": [\"2019-06-01\", null]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vaccinationsJson",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vaccinationsJson"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/coverageExpiredUserList",
+			"item": [
+				{
+					"name": "NOT valid value in filter array for vax name - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": 12\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageExpiredUserList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageExpiredUserList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid values in filter array for days coverage expired - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"days_coverage_expired\":  [70, 35]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageExpiredUserList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageExpiredUserList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid length of filter array for days coverage expired - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"days_coverage_expired\":  [70, 35, 456]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageExpiredUserList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageExpiredUserList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage expired user list without filters - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageExpiredUserList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageExpiredUserList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage expired user list with only vax name filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": \"Comirnaty\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageExpiredUserList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageExpiredUserList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage expired user list with only days coverage expired filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"days_coverage_expired\":  [100, 1000]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageExpiredUserList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageExpiredUserList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage expired user list with all filters - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4ifQ.y9mUpPvgJvcLnCuJxWgWB9clJ7aAwJsiIB2cK-1iwJI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vax_name\": \"COMIRNATY\",\r\n    \"days_coverage_expired\":  [100, null]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageExpiredUserList",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageExpiredUserList"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/coverageDataUser",
+			"item": [
+				{
+					"name": "Get JSON/PDF role:Admin - NOT valid value for user key - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjpudWxsfQ.j7o4Or9goZWaOyqVX5Vgz2PlkR4HiIZDwh3_4_lnTQA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"format\": \"JSON\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageDataUser",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageDataUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON/PDF role:Admin - NOT valid value for format - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"format\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageDataUser",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageDataUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON/PDF role:Admin - NOT valid value for order by filter - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"format\": \"JSON\",\r\n    \"order_by\": 1243\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageDataUser",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageDataUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON/PDF role:Admin - JSON without order by filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"format\": \"JSON\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageDataUser",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageDataUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON/PDF role:Admin - JSON with order by filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"format\": \"JSON\",\r\n    \"order_by\": \"ASC\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageDataUser",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageDataUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON/PDF role:Admin - PDF without order by filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"format\": \"PDF\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageDataUser",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageDataUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON/PDF role:Admin - PDF with order by filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"format\": \"PDF\",\r\n    \"order_by\": \"DESC\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageDataUser",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageDataUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON/PDF role:User - JSON with order by filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhdHRpIiwidXNlcktleSI6IkdUVE5EUjgwQTAzQTI3MVUiLCJyb2xlIjoiVXNlciJ9.yIwgpiJ1CEanq6upZsG5DWk2hMb8Z62n-FiYhxzyUoU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"format\": \"JSON\",\r\n    \"order_by\": \"DESC\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageDataUser",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageDataUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get JSON/PDF role:User - PDF with order by filter - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiR1RUTkRSODBBMDNBMjcxVSJ9.yzyjDtM8GII-89lWyLgM2AiQAo4hQPZ2owinrbd21qE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"format\": \"PDF\",\r\n    \"order_by\": \"ASC\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/coverageDataUser",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coverageDataUser"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/statistics",
+			"item": [
+				{
+					"name": "NOT Admin in route - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiR2lvcmdpbyIsInN1cm5hbWUiOiJGYW5lc2kiLCJyb2xlIjoiVXNlciIsInVzZXJLZXkiOiJGTlNHUkc1N0IwMkg1MDFaIn0.C5cP5Jo7Dw4f1DebTzYmVFeu1HdtAoNuKYpIFHxZcfY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/statistics",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"statistics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Statistics month aggregation - OK",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiUk1HTFJBNzFSNjhINTAxViJ9.OdjpKygZE3q-elLaPEmsurk3Js21uFBbB83-7yZQIPk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/statistics",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"statistics"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/generateRedisKey",
+			"item": [
+				{
+					"name": "NOT Admin in route - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiR2lvcmdpbyIsInN1cm5hbWUiOiJGYW5lc2kiLCJyb2xlIjoiVXNlciIsInVzZXJLZXkiOiJGTlNHUkc1N0IwMkg1MDFaIn0.C5cP5Jo7Dw4f1DebTzYmVFeu1HdtAoNuKYpIFHxZcfY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": null,\n    \"name\": null,\n    \"surname\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/generateRedisKey",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"generateRedisKey"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOT valid user data value - KO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiUk1HTFJBNzFSNjhINTAxViJ9.OdjpKygZE3q-elLaPEmsurk3Js21uFBbB83-7yZQIPk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": null,\n    \"name\": null,\n    \"surname\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/generateRedisKey",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"generateRedisKey"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get redis key - OK",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiUk1HTFJBNzFSNjhINTAxViJ9.OdjpKygZE3q-elLaPEmsurk3Js21uFBbB83-7yZQIPk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_key\": \"GXDFPC46P09D005H\",\n    \"name\": \"Gexda\",\n    \"surname\": \"Fapaci\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/generateRedisKey",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"generateRedisKey"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "UnexpectedRoute",
+			"item": [
+				{
+					"name": "GET unexpected route - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiUk1HTFJBNzFSNjhINTAxViJ9.OdjpKygZE3q-elLaPEmsurk3Js21uFBbB83-7yZQIPk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/test",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"test"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST unexpected route - KO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQW5kcmVhIiwic3VybmFtZSI6IkdhbGVhenppIiwidXNlcktleSI6IkdMWk5EUjgwUDAzRjIwNUkiLCJyb2xlIjoiQWRtaW4iLCJ1c2VyS2V5Q2xpZW50IjoiUk1HTFJBNzFSNjhINTAxViJ9.OdjpKygZE3q-elLaPEmsurk3Js21uFBbB83-7yZQIPk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/test",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"test"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
