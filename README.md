@@ -29,6 +29,38 @@ In particolare, il servizio ha lo scopo di implementare le seguenti funzionalit√
 ### Diagramma dei casi d'uso
 ![use_case_diagram](resources/use_case_diagram.png)
 ### Diagramma delle sequenze
+#### Aggiungere un vaccino
+![addVax](resources/sequenceDiagram/1.addVax.png)
+
+#### Aggiungere dosi consegnate
+![addDoses](resources/sequenceDiagram/2.addDoses.png)
+
+#### Visualizzare lista vaccini
+![vaxList](resources/sequenceDiagram/3.vaxList.png)
+
+#### Ricevere informazioni sulla disponibilit√† dei vaccini
+![availableVaxDoses](resources/sequenceDiagram/4.availableVaxDoses.png)
+
+#### Aggiungere una vaccinazione
+![addVaccination](resources/sequenceDiagram/5.addVaccination.png)
+
+#### Scaricare un PDF con la lista delle vaccinazioni di un dato utente
+![downloadPDF](resources/sequenceDiagram/6.downloadPDF.png)
+
+#### Ottenere un file JSON con la lista delle vaccinazioni di un dato utente
+![vaccinationsJson](resources/sequenceDiagram/7.vaccinationsJson.png)
+
+#### Ottenere la lista delle persone con copertura scaduta
+![coverageExpiredUserList](resources/sequenceDiagram/8.coverageExpiredUserList.png)
+
+#### Per un dato utente ottenere per ogni vaccino informazioni circa la fine della copertura
+![coverageDataUser](resources/sequenceDiagram/9.coverageDataUser.png)
+
+#### Ottenere statistiche sulle dosi somministrate, sulle dosi consegnate e sugli utenti scoperti
+![use_case_diagram](resources/sequenceDiagram/10.statistics.png)
+
+#### Ottenere chiave REDIS temporanea per la rotta /vaccinationsJson
+![generateRedisKey](resources/sequenceDiagram/11.generateRedisKey.png)
 
 ## Richieste
 #tabella rotte - get post - autenticazione (samu)
