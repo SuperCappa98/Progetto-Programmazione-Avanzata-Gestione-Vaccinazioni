@@ -38,7 +38,7 @@ In particolare, il servizio ha lo scopo di implementare le seguenti funzionalit�
 #### Visualizzare lista vaccini
 ![vaxList](resources/sequenceDiagram/3.vaxList.png)
 
-#### Ricevere informazioni sulla disponibilità dei vaccini
+#### Ricevere informazioni sulla disponibilità di un dato vaccino
 ![availableVaxDoses](resources/sequenceDiagram/4.availableVaxDoses.png)
 
 #### Aggiungere una vaccinazione
@@ -244,10 +244,32 @@ Il payload deve essere inserito nel body della richiesta in formato JSON secondo
 
 ## Pattern utilizzati
 ### Singleton
+Il Singleton è un design pattern creazionale che ci assicura un'unica istanza di una certa classe, garantendo però l'accesso globale ad una determinata istanza.
+Il costruttore di default è privato, per prevenire l'uso dell'operatore "New" associato alla classe Singleton.
+In questa classe si definisce un metodo statico che funge da costruttore: quando richiamato l'oggetto verrà creato solamente in assenza di un'ulteriore istanza.
+Abbiamo utilizzato questo pattern per definire la connessione con il database, al fine di garantirne l'unicità.
+
 ### DAO
+Il Data Access Object  è un pattern architetturale utile per l'astrazione dei dati persistenti.
+Il DAO ci permette di isolare lo strato della logica di applicazione dallo strato di persistenza dei dati tramite un meccanismo di astrazione.
+Questa interfaccia nasconde all'applicazione la complessità delle  operazioni CRUD del sottostante meccanismo di storage, permettendo ad entrambi gli strati di evolvere separatamente senza conoscere nulla l'uno dell'altro.
+Disaccoppiare lo strato di logica dallo strato dei dati persitenti permette di essere molto più flessibili nella scelta del meccanismo di storage, il quale potrà facilmente essere cambiato in futuro.
+Abbiamo, quindi, utilizzato questo pattern al fine di rendere la nostra applicazione più flessibile e manutenibile nel tempo. 
+
 ### Factory Method
+Il Factory Method è un design pattern creazionale che fornisce un'interfaccia per la creazione di oggetti in una super classe, ma permette alle sottoclassi di alterare il tipo di oggetti che saranno creati. Si usa quindi l'interfaccia per istanziare oggetti diversi.
+ Abbiamo utilizzato questo pattern per la generazione dei messaggi di errore e di successo da ritornare al client.
+
 ### Model - Controller
+Il pattern architetturale comunemente conosciuto è il Model View Controller: essendo il nostro progetto improntato sullo sviluppo di un back-end, la componente di View non può essere implementata.
+Utilizzando questo pattern abbiamo suddiviso il sistema in due componenti logiche in grado di interagire fra di loro.
+Il componente Model gestisce i dati e le operazioni su quest'ultimi, mentre il controller gestisce l'interazione con l'utente. Lo scopo è rendere il codice più strutturato possibile 
+
 ### Chain of Responsability
+La Chain of Responsability è un design patter comportamentale che permette di far passare la richiesta lungo una catena di handlers.
+E' necessario implementare un pattern di questo tipo al crescere della complessità dell'applicazione, infatti più saranno i controlli che devono esser fatti sulle richieste e più il codice sarebbe confusionario e duplicato senza un meccanisco di handler in serie.
+Ogni handler prende la richiesta come argomento ed ha un riferimento all'handler successivo: se il controllo non va a buon fine l'handler restituirà un errore, altrimenti passerà la richiesta all'handler seguente. 
+Se la richiesta riesce ad attraversare tutti i middleware della catena, verrà allora elaborata dal controller.
 
 ## Avvio del progetto
 > Per poter eseguire il progetto è necessario avere installato [Docker](https://www.docker.com) sulla propria macchina.
