@@ -2,14 +2,36 @@
 
 
 ## Obiettivo del progetto
-#funzionalità
+L'obiettivo del progetto consiste nella realizzazione di un servizio di back-end per la gestione delle vaccinazioni.
+Il sistema deve consentire di gestire l’invio da parte di un operatore autorizzato dell’avvenuta vaccinazione di un individuo.
+L'accesso al servizio deve avvenire tramite autenticazione JWT e ad ogni individuo deve essere associato un ruolo: admin o user semplice.
+In particolare, il servizio ha lo scopo di implementare le seguenti funzionalità.
+
+
+|     Funzionalità  	| Ruolo |
+| ------------- | ------------- |
+| Aggiungere un nuovo vaccino  | admin |
+| Inserire la consegna di N dosi di vaccino  |  admin |
+| Ottenere la lista dei vaccini filtrata per nome vaccino, disponibilità e scadenza  | admin |
+|Ottenere informazioni sulle dosi disponibili per un dato vaccino | admin  |
+| Inserire una vaccinazione per un dato utente  | admin  |
+| Scaricare un PDF che contenga tutte le vaccinazioni effettuate da uno specifico utente  | admin/user  |
+| Ottenere in formato JSON la lista delle vaccinazioni effettuate da uno specifico utente dando la possibilità di filtrare per nome vaccino e/o data di somministrazione   | admin/user  |
+| Ottenere la lista delle persone che hanno la copertura scaduta con eventuali filtri su nome vaccino e numero di giorni di copertura scaduta  | admin |
+| Ottenere in formato JSON o PDF l'elenco per ogni vaccino fatto per un dato utente il numero di giorni che mancano alla mancata copertura o il numero giorni trascorsi dalla fine della copertura | admin/user  |
+| Ottenere delle statistiche sulle dosi somministrate, sulle dosi consegnate e sugli utenti con copertura scaduta| admin |
+|Ottenere un codice univoco con durata N minuti per un dato utente che consenta di generare il JSON con la lista delle vaccinazioni effettuate da uno specifico| admin|
+
+
+
 
 ## Diagrammi UML
 ### Diagramma dei casi d'uso
+![use_case_diagram](resources/use_case_diagram.png)
 ### Diagramma delle sequenze
 
 ## Richieste
-#tabella rotte - get post - autenticazione
+#tabella rotte - get post - autenticazione (samu)
 ### /addVax
 ### /vaxList
 
