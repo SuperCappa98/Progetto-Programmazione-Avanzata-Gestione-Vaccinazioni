@@ -1,5 +1,6 @@
+// Import libraries
 import {Msg} from "./Msg";
-const { StatusCode } = require('status-code-enum')
+const {StatusCode} = require('status-code-enum')
 
 
 class MissingTokenErrorMsg implements Msg{
@@ -176,6 +177,14 @@ export enum ErrorMsgEnum {
     RouteNotFound
 }
 
+/**
+ * Function 'getErrorMsg'
+ * 
+ * Function invoked by the Chains of Responsability middleware layers or controller when a route ends with an error
+ * 
+ * @param type Type of the error message obtained (is one of the values of the {@link ErrorMsgEnum})
+ * @returns An object of the {@link Msg} interface representing an error message  
+ */
 export function getErrorMsg(type: ErrorMsgEnum): Msg{
     let msgval: Msg;
     switch(type){

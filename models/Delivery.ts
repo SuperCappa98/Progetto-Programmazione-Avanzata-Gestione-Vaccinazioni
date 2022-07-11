@@ -1,9 +1,16 @@
-import { DBSingleton } from "../singleton/DBSingleton";
-import { DataTypes, Sequelize } from 'sequelize';
+// Import libraries
+import {DBSingleton} from "../singleton/DBSingleton";
+import {DataTypes, Sequelize} from 'sequelize';
+
 
 //Connection to database
 const sequelize: Sequelize = DBSingleton.getConnection();
 
+/**
+ * Model 'Delivery'
+ * 
+ * Define the model 'Delivery' to interface with the "delivery" table in the PostgreSQL database
+ */
 export const Delivery = sequelize.define('delivery', {
     batch: {
         type: DataTypes.STRING(50),

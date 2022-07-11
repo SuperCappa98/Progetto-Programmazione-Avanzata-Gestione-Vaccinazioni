@@ -1,6 +1,15 @@
+// Import libraries
 require('dotenv').config();
 import {Sequelize} from 'sequelize';
 
+
+/**
+ * Class 'DBSingleton'
+ * 
+ * Class that ensures that there is a single instance of an object during the service lifecycle.
+ * In this project, the object is used to build the database connection through the library {@link Sequelize},
+ * thus ensuring a single connection to the PostgreSQL database 
+ */
 export class DBSingleton {
 
     private static instance: DBSingleton;

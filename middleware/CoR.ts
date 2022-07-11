@@ -1,10 +1,14 @@
+// Import libraries
 import * as JwtMiddleware from './jwt_middleware';
 import * as errorHandler from './error_handlers';
 import * as vaxMiddleware from './vax_middleware';
 
 
 /**
- * Chain of responsability to call middlewares 
+ * Chains of Responsability to call middlewares 
+ * 
+ * The following chains define which middleware layers and in what order 
+ * must be checked for the HTTP request to reach the controller
  */
 
  export const jwt = [
