@@ -25,10 +25,13 @@ app.use(async function (req, res,next) {
 
     if(req.path==="/vaccinationsJson" && !req.headers.authorization && typeof(req.body.redis_key) === "string"){
         const redis = require('redis');
+        const client = createClient({ url: 'redis://'+process.env.REDISHOST+':'+process.env.REDISPORT });
+        /*
         const client = redis.createClient({
             host: process.env.REDISHOST,
             port: process.env.REDISPORT
         })
+        */
 
         client.on('error', (err:any) => console.log('Redis Client Error', err));
 

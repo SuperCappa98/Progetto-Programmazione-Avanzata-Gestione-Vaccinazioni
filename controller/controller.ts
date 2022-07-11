@@ -11,6 +11,7 @@ const PDFDocument = require('pdfkit');
 import { SingleVax } from '../utils/statistics';
 const math = require('mathjs');
 require('dotenv').config();
+import { createClient } from 'redis';
 
 const sequelize: Sequelize = DBSingleton.getConnection();
 
@@ -852,10 +853,13 @@ export async function statistics(res:any){
 export async function generateRedisKey(user_key:string, name:string, surname:string, res:any){
     try{
         const redis = require('redis');
+        const client = createClient({ url: 'redis://'+process.env.REDISHOST+':'+process.env.REDISPORT });
+        /*
         const client = redis.createClient({
             host: process.env.REDISHOST,
             port: process.env.REDISPORT
         })
+        */
 
         client.on('error', (err:any) => console.log('Redis Client Error', err));
 
