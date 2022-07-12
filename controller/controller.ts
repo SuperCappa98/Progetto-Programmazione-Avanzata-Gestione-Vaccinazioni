@@ -790,7 +790,7 @@ export async function coverageDataUser(req_user:any, format:string, order_by:str
         }else if(format == "PDF"){ // PDF vaccination coverage user data format
             // create PDF template
             let doc = new PDFDocument({ margin: 50, bufferPages:true, pdfVersion: '1.5', tagged:true, displayTitle:true});
-            console.log(doc);
+            //console.log(doc);
 
             // Document meta data
             doc.info['Title'] = 'Dati sulla copertura vaccinale';
